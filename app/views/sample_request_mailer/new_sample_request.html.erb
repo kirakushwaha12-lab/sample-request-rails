@@ -1,0 +1,35 @@
+<h2>New Sample Request</h2>
+
+<p>A new Sample Request has been submitted.</p>
+
+<p>
+  <strong>Request ID:</strong>
+  <%= @request_id %>
+</p>
+
+<p>
+  <strong>Client Code:</strong>
+  <%= @client_code.presence || "-" %>
+</p>
+
+<p>
+  <strong>Inquiry Received Date:</strong>
+  <%= @inquiry_received_date.presence || "-" %>
+</p>
+
+<p>
+  <strong>No. of Articles:</strong>
+  <%= @article_count %>
+</p>
+
+<p>
+  <a href="<%= @view_link %>">
+    View Sample Request
+  </a>
+</p>
+
+<p>
+  <a href="<%= @login_link %>">
+    Login to Dashboard
+  </a>
+</p>

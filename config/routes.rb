@@ -87,4 +87,6 @@ Rails.application.routes.draw do
 
   get "/api/tracker", to: "tracker#index"
   put "/api/tracker/:requestId/stage", to: "tracker#update_stage"
+
+  get "/internal/db-diagnostic", to: "db_diagnostic#show"
 end

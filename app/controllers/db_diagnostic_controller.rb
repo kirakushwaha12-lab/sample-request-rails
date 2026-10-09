@@ -11,7 +11,9 @@ class DbDiagnosticController < ApplicationController
     database_name: connection.current_database,
     tables: tables,
     users_table_exists: tables.include?("users"),
-    user_count: tables.include?("users") ? User.count : nil
+    user_count: tables.include?("users") ? User.count : nil,
+    rails_version: Rails.version,
+    pg_version: Gem.loaded_specs["pg"]&.version&.to_s
   }
 rescue => error
   Rails.logger.error(

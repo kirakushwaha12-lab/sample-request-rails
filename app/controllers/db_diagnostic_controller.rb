@@ -4,6 +4,7 @@ class DbDiagnosticController < ApplicationController
     return unauthorized unless valid_token?
 
     connection = ActiveRecord::Base.connection
+    connection.schema_cache.clear!
     tables = connection.tables.sort
 
     render json: {
@@ -47,7 +48,8 @@ class DbDiagnosticController < ApplicationController
     connection.transaction do
       connection.raw_connection.exec(sql)
     end
-
+    
+    connection.schema_cache.clear!
     tables = connection.tables.sort
 
     render json: {

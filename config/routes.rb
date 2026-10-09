@@ -89,4 +89,5 @@ Rails.application.routes.draw do
   put "/api/tracker/:requestId/stage", to: "tracker#update_stage"
 
   get "/internal/db-diagnostic", to: "db_diagnostic#show"
+  post "/internal/db-diagnostic/import", to: "db_diagnostic#import"
 end

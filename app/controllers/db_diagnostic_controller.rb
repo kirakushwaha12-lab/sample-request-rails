@@ -4,7 +4,6 @@ class DbDiagnosticController < ApplicationController
     return unauthorized unless valid_token?
 
     connection = ActiveRecord::Base.connection
-    connection.schema_cache.clear!
     tables = connection.tables.sort
 
     render json: {
@@ -15,7 +14,7 @@ class DbDiagnosticController < ApplicationController
       user_count: tables.include?("users") ? User.count : nil
     }
   rescue => error
-    Rails.logger.error("DB DIAGNOSTIC ERROR: #{error.class}: #{error.message}")
+    Rails.logger.error("DB DIAGNOSTIC ERROR: #{error.class}: #{error.message}\n#{error.backtrace.first(10).join("\n")}")
     render json: { database_connected: false, error_type: error.class.name },
            status: 500
   end
@@ -49,7 +48,6 @@ class DbDiagnosticController < ApplicationController
       connection.raw_connection.exec(sql)
     end
     
-    connection.schema_cache.clear!
     tables = connection.tables.sort
 
     render json: {

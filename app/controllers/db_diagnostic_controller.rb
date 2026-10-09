@@ -1,23 +1,30 @@
 
 class DbDiagnosticController < ApplicationController
   def show
-    return unauthorized unless valid_token?
+  return unauthorized unless valid_token?
 
-    connection = ActiveRecord::Base.connection
-    tables = connection.tables.sort
+  connection = ActiveRecord::Base.connection
+  tables = connection.tables.sort
 
-    render json: {
-      database_connected: true,
-      database_name: connection.current_database,
-      tables: tables,
-      users_table_exists: tables.include?("users"),
-      user_count: tables.include?("users") ? User.count : nil
-    }
-  rescue => error
-    Rails.logger.error("DB DIAGNOSTIC ERROR: #{error.class}: #{error.message}\n#{error.backtrace.first(10).join("\n")}")
-    render json: { database_connected: false, error_type: error.class.name },
-           status: 500
-  end
+  render json: {
+    database_connected: true,
+    database_name: connection.current_database,
+    tables: tables,
+    users_table_exists: tables.include?("users"),
+    user_count: tables.include?("users") ? User.count : nil
+  }
+rescue => error
+  Rails.logger.error(
+    "DB DIAGNOSTIC ERROR: #{error.class}: #{error.message}\n#{error.backtrace.first(10).join("\n")}"
+  )
+
+  render json: {
+    database_connected: false,
+    error_type: error.class.name,
+    error_message: error.message,
+    error_location: error.backtrace.first
+  }, status: 500
+end
 
   def import
     return unauthorized unless valid_token?

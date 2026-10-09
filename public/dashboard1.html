@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Sample Request Management System</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #f5f6f8;
+      color: #222;
+      min-height: 100vh;
+    }
+
+    /* HEADER */
+
+    .header {
+      height: 82px;
+      background: #222;
+      color: #fff;
+      padding: 0 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .header h1 {
+      font-size: 28px;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+    }
+
+    .profile-circle {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: #fff;
+      color: #222;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 21px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .profile-circle:hover {
+      transform: scale(1.05);
+    }
+
+
+    /* MAIN CONTENT */
+
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 38px 42px 45px;
+    }
+
+    .welcome {
+      margin-bottom: 30px;
+    }
+
+    .welcome h2 {
+      font-size: 29px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .welcome p {
+      color: #666;
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+
+    /* CARDS */
+
+    .cards {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      gap: 24px;
+      width: 100%;
+    }
+
+    .card {
+      flex: 1 1 0;
+      width: 100%;
+      background: #fff;
+      border: 1px solid #e3e3e3;
+      border-radius: 12px;
+      padding: 30px 28px;
+      min-height: 165px;
+      cursor: pointer;
+
+      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
+
+      transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.10);
+    }
+
+    .card h3 {
+      font-size: 19px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+
+    .card p {
+      color: #666;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+
+    /* LOGOUT */
+
+    .logout {
+      margin-top: 30px;
+      padding: 11px 22px;
+      border: none;
+      border-radius: 6px;
+      background: #222;
+      color: #fff;
+      font-size: 14px;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .logout:hover {
+      background: #333;
+    }
+
+
+    /* MOBILE */
+
+    @media (max-width: 700px) {
+
+      .header {
+        height: 72px;
+        padding: 0 20px;
+      }
+
+      .header h1 {
+        font-size: 23px;
+      }
+
+      .profile-circle {
+        width: 46px;
+        height: 46px;
+        font-size: 19px;
+      }
+
+      .container {
+        padding: 30px 20px 35px;
+      }
+
+      .welcome {
+        margin-bottom: 24px;
+      }
+
+      .welcome h2 {
+        font-size: 25px;
+      }
+
+      .welcome p {
+        font-size: 14px;
+      }
+
+      .cards {
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .card {
+        min-height: 135px;
+        padding: 25px;
+      }
+
+      .card h3 {
+        font-size: 18px;
+      }
+
+      .card p {
+        font-size: 14px;
+      }
+
+      .logout {
+        margin-top: 24px;
+      }
+    }
+  </style>
+
+
+</head>
+
+<body>
+
+  <header class="header">
+
+    <h1>Sample Request Management System</h1>
+
+    <div class="profile-circle" id="profileCircle" onclick="viewProfile()" title="My Profile">
+      U
+    </div>
+
+  </header>
+
+
+  <main class="container">
+
+    <section class="welcome">
+      <h2>Dashboard</h2>
+      <p>Manage sample requests and track their progress.</p>
+    </section>
+
+
+    <section class="cards">
+
+      <div class="card" id="newRequestCard" style="display: none;" onclick="createRequest()">
+        <h3>➕ New Sample Request</h3>
+        <p>Create a new sample request.</p>
+      </div>
+
+
+      <div class="card" onclick="viewRequests()">
+        <h3>📋 Sample Requests</h3>
+        <p>View and manage submitted requests.</p>
+      </div>
+
+
+      <div class="card" onclick="viewTracker()">
+        <h3>📊 Tracker</h3>
+        <p>Track the progress of sample requests.</p>
+      </div>
+
+    </section>
+
+
+    <button class="logout" onclick="logout()">
+      Logout
+    </button>
+
+  </main>
+
+
+  <script>
+
+    const token =
+      localStorage.getItem("token");
+
+
+    if (!token) {
+
+      window.location.href =
+        "login1.html";
+
+    } else {
+
+      fetch("/api/auth/me", {
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      })
+        .then(response => {
+
+          if (!response.ok) {
+            throw new Error("Authentication failed");
+          }
+
+          return response.json();
+
+        })
+        .then(data => {
+
+          const user = data.user;
+
+
+          /* DB-based role check */
+
+          const newRequestCard =
+            document.getElementById("newRequestCard");
+
+          if (newRequestCard) {
+
+            if (user.role !== "sampler") {
+              newRequestCard.style.display = "block";
+            }
+
+          }
+
+          /* Profile initial */
+
+          const profileCircle =
+            document.getElementById(
+              "profileCircle"
+            );
+
+
+          const displayName =
+            user.name &&
+              user.name.trim()
+              ? user.name.trim()
+              : user.user_id;
+
+
+          profileCircle.textContent =
+            displayName
+              ? displayName
+                .charAt(0)
+                .toUpperCase()
+              : "U";
+
+        })
+        .catch(error => {
+
+          console.error(
+            "User authentication error:",
+            error
+          );
+
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+
+          window.location.href =
+            "login1.html";
+
+        });
+    }
+
+
+    function createRequest() {
+
+      window.location.href =
+        "sample request2.html";
+
+    }
+
+
+    function viewRequests() {
+
+      window.location.href =
+        "sample requests1.html";
+
+    }
+
+    function viewTracker() {
+
+      window.location.href =
+        "tracker.html";
+
+    }
+
+
+    function viewProfile() {
+
+      window.location.href =
+        "profile1.html";
+
+    }
+
+
+    function logout() {
+
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+
+      window.location.href =
+        "login1.html";
+
+    }
+
+  </script>
+</body>
+
+</html>

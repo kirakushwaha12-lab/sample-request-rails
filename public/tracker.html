@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Tracker</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f6fa;
+            color: #222;
+        }
+
+        .container {
+            max-width: 1150px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 28px;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, .08);
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .page-title {
+            margin: 0;
+            font-size: 26px;
+        }
+
+        .back-btn {
+            border: 1px solid #ccc;
+            background: white;
+            padding: 9px 15px;
+            border-radius: 7px;
+            cursor: pointer;
+            text-decoration: none;
+            color: #222;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #f1f2f5;
+            text-align: left;
+            padding: 13px;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 14px 13px;
+            border-bottom: 1px solid #eee;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        tr:hover td {
+            background: #fafafa;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 5px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 7px;
+        }
+
+        .action-btn {
+            border: none;
+            padding: 7px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .view-btn {
+            background: #eee;
+            color: #222;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: #777;
+            display: none;
+        }
+
+        .loading-state {
+            text-align: center;
+            padding: 30px 20px;
+            color: #777;
+        }
+
+        .error-state {
+            text-align: center;
+            padding: 30px 20px;
+            color: #9b2226;
+            display: none;
+        }
+
+
+        .subtitle {
+            color: #777;
+            margin-bottom: 28px;
+        }
+
+        @media (max-width: 650px) {
+
+            .card {
+                padding: 18px;
+            }
+
+            .page-header {
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .page-title {
+                font-size: 21px;
+            }
+
+            .search-area {
+                flex-direction: column;
+            }
+
+            .status-filter {
+                width: 100%;
+            }
+
+        }
+
+        .tracker-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.35);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .tracker-modal-content {
+            width: 100%;
+            max-width: 600px;
+            background: white;
+            border-radius: 12px;
+            padding: 28px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, .15);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .modal-title {
+            margin: 0;
+            font-size: 22px;
+        }
+
+        .close-btn {
+            border: none;
+            background: transparent;
+            font-size: 24px;
+            cursor: pointer;
+            color: #555;
+        }
+
+        .request-info {
+            margin-bottom: 25px;
+        }
+
+        .request-info p {
+            margin: 8px 0;
+            font-size: 14px;
+        }
+
+        .stage-list {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-top: 30px;
+            position: relative;
+        }
+
+        .stage-list::before {
+            content: "";
+            position: absolute;
+            top: 9px;
+            left: 8.33%;
+            right: 8.33%;
+            height: 3px;
+            background: #ddd;
+            z-index: 0;
+        }
+
+        .stage-progress {
+            position: absolute;
+            top: 9px;
+            left: 8.33%;
+            height: 3px;
+            background: #22a447;
+            z-index: 1;
+            width: 0;
+        }
+
+        .stage-item {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 16.66%;
+            text-align: center;
+        }
+
+        .stage-icon {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #fff;
+            border: 3px solid #d5d5d5;
+        }
+
+        .stage-item.completed .stage-icon,
+        .stage-item.current .stage-icon {
+            background: #22a447;
+            border-color: #22a447;
+        }
+
+        .stage-name {
+            margin-top: 10px;
+            font-size: 12px;
+            line-height: 16px;
+            color: #666;
+        }
+
+        .stage-item.completed .stage-name,
+        .stage-item.current .stage-name {
+            color: #222;
+            font-weight: 600;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .modal-close-btn {
+            border: 1px solid #ccc;
+            background: white;
+            padding: 9px 15px;
+            border-radius: 7px;
+            cursor: pointer;
+        }
+
+        .search-area {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 22px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #d2d6dc;
+            border-radius: 7px;
+            font-size: 14px;
+        }
+
+        .status-filter {
+            width: 180px;
+            padding: 12px;
+            border: 1px solid #d2d6dc;
+            border-radius: 7px;
+            background: white;
+        }
+
+        table th:nth-child(4),
+        table td:nth-child(4),
+        table th:nth-child(5),
+        table td:nth-child(5) {
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="container">
+
+        <div class="card">
+
+            <div class="page-header">
+                <h2 class="page-title">Tracker</h2>
+
+                <button class="back-btn" onclick="goBack()">
+                    ← Dashboard
+                </button>
+            </div>
+
+            <div class="subtitle">
+                Track Sample Requests
+            </div>
+
+            <div class="search-area">
+
+                <input type="text" id="searchInput" class="search-input" placeholder="Search Request ID / Client Code">
+
+                <select id="statusFilter" class="status-filter">
+                    <option value="">All Stages</option>
+                    <option value="Created">Created</option>
+                    <option value="Received by Sample Department">
+                        Received by Sample Department
+                    </option>
+                    <option value="Pattern Making">Pattern Making</option>
+                    <option value="Sample Cutting">Sample Cutting</option>
+                    <option value="Sample Making">Sample Making</option>
+                    <option value="Sample Ready">Sample Ready</option>
+                </select>
+
+            </div>
+
+            <div class="table-wrapper">
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Request ID</th>
+                            <th>Client Code</th>
+                            <th>Current Stage</th>
+                            <th>Updated On</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="trackerTableBody">
+                    </tbody>
+                </table>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <div id="trackerModal" class="tracker-modal">
+
+        <div class="tracker-modal-content">
+
+            <div class="modal-header">
+
+                <h2 class="modal-title">
+                    Tracker Details
+                </h2>
+
+            </div>
+
+
+            <div class="request-info">
+
+                <p>
+                    <strong>Request ID:</strong>
+                    <span id="modalRequestId">-</span>
+                </p>
+
+                <p>
+                    <strong>Client Code:</strong>
+                    <span id="modalClientCode">-</span>
+                </p>
+
+                <p>
+                    <strong>Current Stage:</strong>
+                    <span id="modalCurrentStage">-</span>
+                </p>
+
+            </div>
+
+
+            <div class="stage-list">
+
+                <div class="stage-progress" id="stageProgress"></div>
+
+                <div class="stage-item" data-stage="Created">
+                    <div class="stage-icon"></div>
+                    <div class="stage-name">Created</div>
+                </div>
+
+                <div class="stage-item" data-stage="Received by Sample Department">
+                    <div class="stage-icon"></div>
+                    <div class="stage-name">Received by Sample Department</div>
+                </div>
+
+                <div class="stage-item" data-stage="Pattern Making">
+                    <div class="stage-icon"></div>
+                    <div class="stage-name">Pattern Making</div>
+                </div>
+
+                <div class="stage-item" data-stage="Sample Cutting">
+                    <div class="stage-icon"></div>
+                    <div class="stage-name">Sample Cutting</div>
+                </div>
+
+                <div class="stage-item" data-stage="Sample Making">
+                    <div class="stage-icon"></div>
+                    <div class="stage-name">Sample Making</div>
+                </div>
+
+                <div class="stage-item" data-stage="Sample Ready">
+                    <div class="stage-icon"></div>
+                    <div class="stage-name">Sample Ready</div>
+                </div>
+
+            </div>
+
+            <div class="modal-actions">
+
+                <button type="button" class="modal-close-btn" onclick="closeTrackerModal()">
+                    Close
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div id="updateTrackerModal" class="tracker-modal">
+
+        <div class="tracker-modal-content">
+
+            <div class="modal-header">
+
+                <h2 class="modal-title">
+                    Update Tracker Stage
+                </h2>
+
+            </div>
+
+            <div class="request-info">
+
+                <p>
+                    <strong>Request ID:</strong>
+                    <span id="updateRequestId">-</span>
+                </p>
+
+                <p>
+                    <strong>Client Code:</strong>
+                    <span id="updateClientCode">-</span>
+                </p>
+
+                <p>
+                    <strong>Current Stage:</strong>
+                    <span id="updateCurrentStage">-</span>
+                </p>
+
+            </div>
+
+            <div style="margin-top: 25px;">
+
+                <label for="nextStageSelect" style="font-weight: 600;">
+                    Select Next Stage
+                </label>
+
+                <select id="nextStageSelect" style="
+                    width: 100%;
+                    padding: 10px;
+                    margin-top: 8px;
+                ">
+                    <option value="">
+                        Select stage
+                    </option>
+
+                    <option value="Received by Sample Department">
+                        Received by Sample Department
+                    </option>
+
+                    <option value="Pattern Making">
+                        Pattern Making
+                    </option>
+
+                    <option value="Sample Cutting">
+                        Sample Cutting
+                    </option>
+
+                    <option value="Sample Making">
+                        Sample Making
+                    </option>
+
+                    <option value="Sample Ready">
+                        Sample Ready
+                    </option>
+
+                </select>
+
+            </div>
+
+            <div class="modal-actions">
+
+                <button type="button" class="modal-close-btn" onclick="closeUpdateTrackerModal()">
+                    Cancel
+                </button>
+
+                <button type="button" class="action-btn update-btn" onclick="saveTrackerStage()">
+                    Update
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+
+        let trackerRequests = [];
+
+        const token =
+            localStorage.getItem("token");
+
+
+        if (!token) {
+
+            window.location.href =
+                "login1.html";
+
+        } else {
+
+            fetch("/api/auth/me", {
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            })
+                .then(response => {
+
+                    if (!response.ok) {
+                        throw new Error("Authentication failed");
+                    }
+
+                    return response.json();
+
+                })
+                .then(data => {
+
+                    const user = data.user;
+
+                    window.currentUserRole =
+                        user.role.toLowerCase();
+
+
+                    /* Profile initial */
+
+
+
+                    fetch("/api/tracker", {
+                        headers: {
+                            "Authorization": `Bearer ${token}`
+                        }
+                    })
+                        .then(response => {
+
+                            if (!response.ok) {
+                                throw new Error("Failed to fetch tracker data");
+                            }
+
+                            return response.json();
+
+                        })
+                        .then(data => {
+
+                            trackerRequests = data;
+                            console.log("TRACKER API DATA:", data);
+
+                            const tableBody =
+                                document.getElementById("trackerTableBody");
+
+                            tableBody.innerHTML = "";
+
+                            if (!Array.isArray(data) || data.length === 0) {
+
+                                tableBody.innerHTML = `
+        <tr>
+          <td colspan="5" style="text-align:center;">
+            No sample requests found.
+          </td>
+        </tr>
+      `;
+
+                                return;
+                            }
+
+                            function displayRequests() {
+
+                                const tableBody =
+                                    document.getElementById("trackerTableBody");
+
+                                const search =
+                                    document
+                                        .getElementById("searchInput")
+                                        .value
+                                        .trim()
+                                        .toLowerCase();
+
+                                const selectedStage =
+                                    document
+                                        .getElementById("statusFilter")
+                                        .value;
+
+                                const filteredRequests =
+                                    trackerRequests.filter(request => {
+
+                                        const requestId =
+                                            String(
+                                                request.request_id || ""
+                                            ).toLowerCase();
+
+                                        const clientCode =
+                                            String(
+                                                request.client_code || ""
+                                            ).toLowerCase();
+
+                                        const currentStage =
+                                            String(
+                                                request.current_stage || "Created"
+                                            );
+
+                                        const searchMatch =
+                                            requestId.includes(search) ||
+                                            clientCode.includes(search);
+
+                                        const stageMatch =
+                                            selectedStage === "" ||
+                                            currentStage === selectedStage;
+
+                                        return (
+                                            searchMatch &&
+                                            stageMatch
+                                        );
+                                    });
+
+                                tableBody.innerHTML = "";
+
+                                if (filteredRequests.length === 0) {
+
+                                    tableBody.innerHTML = `
+            <tr>
+                <td colspan="5" style="text-align:center;">
+                    No sample requests found.
+                </td>
+            </tr>
+        `;
+
+                                    return;
+                                }
+
+                                filteredRequests.forEach(request => {
+
+                                    const requestId =
+                                        request.request_id || "-";
+
+                                    const clientCode =
+                                        request.client_code || "-";
+
+                                    const currentStage =
+                                        request.current_stage || "Created";
+
+                                    const updatedDate =
+                                        formatDate(
+                                            request.updated_at
+                                        );
+
+                                    const row =
+                                        document.createElement("tr");
+
+                                    row.innerHTML = `
+
+            <td>
+                ${escapeHtml(requestId)}
+            </td>
+
+            <td>
+                ${escapeHtml(clientCode)}
+            </td>
+
+            <td>
+                <strong>
+                    ${escapeHtml(currentStage)}
+                </strong>
+            </td>
+
+            <td>
+                ${escapeHtml(updatedDate)}
+            </td>
+
+            <td>
+                ${window.currentUserRole === "sampler" &&
+                                            currentStage !== "Sample Ready"
+                                            ? `
+                        <button
+                            type="button"
+                            class="action-btn update-btn"
+                            data-request-id="${escapeHtml(requestId)}"
+                            onclick="updateTrackerRequest(this.dataset.requestId)"
+                        >
+                            UPDATE
+                        </button>
+                    `
+                                            : `
+                        <button
+                            type="button"
+                            class="action-btn view-btn"
+                            data-request-id="${escapeHtml(requestId)}"
+                            onclick="viewTrackerRequest(this.dataset.requestId)"
+                        >
+                            VIEW
+                        </button>
+                    `
+                                        }
+            </td>
+
+        `;
+
+                                    tableBody.appendChild(row);
+
+                                });
+                            }
+
+                            displayRequests();
+
+                            document
+                                .getElementById("searchInput")
+                                .addEventListener(
+                                    "input",
+                                    displayRequests
+                                );
+
+                            document
+                                .getElementById("statusFilter")
+                                .addEventListener(
+                                    "change",
+                                    displayRequests
+                                );
+
+                        })
+
+                        .catch(error => {
+
+                            console.error(
+                                "Tracker data error:",
+                                error
+                            );
+
+                        });
+
+                })
+                .catch(error => {
+
+                    console.error(
+                        "User authentication error:",
+                        error
+                    );
+
+                    localStorage.removeItem("token");
+                    localStorage.removeItem("user");
+
+                    window.location.href =
+                        "login1.html";
+
+                });
+
+        }
+
+
+        function viewProfile() {
+
+            window.location.href =
+                "profile1.html";
+
+        }
+
+
+        function goBack() {
+
+            window.location.href =
+                "dashboard1.html";
+
+        }
+
+        function viewTrackerRequest(requestId) {
+
+            const request =
+                trackerRequests.find(
+                    item =>
+                        String(item.request_id) ===
+                        String(requestId)
+                );
+
+            if (!request) {
+                return;
+            }
+
+            document.getElementById("modalRequestId").textContent =
+                request.request_id || "-";
+
+            document.getElementById("modalClientCode").textContent =
+                request.client_code || "-";
+
+            document.getElementById("modalCurrentStage").textContent =
+                request.current_stage || "Created";
+
+            const stages = [
+                "Created",
+                "Received by Sample Department",
+                "Pattern Making",
+                "Sample Cutting",
+                "Sample Making",
+                "Sample Ready"
+            ];
+
+
+            const currentStage =
+                request.current_stage || "Created";
+
+            const currentIndex =
+                stages.indexOf(currentStage);
+
+
+            document.querySelectorAll(".stage-item").forEach((item, index) => {
+
+                item.classList.remove("completed", "current");
+
+                if (index < currentIndex) {
+
+                    item.classList.add("completed");
+
+                }
+                else if (index === currentIndex) {
+
+                    item.classList.add("current");
+
+                }
+
+            });
+
+
+            const progress =
+                document.getElementById("stageProgress");
+
+            const progressPercentage =
+                (currentIndex / (stages.length - 1)) * 83.34;
+
+            progress.style.width =
+                `${progressPercentage}%`;
+
+
+            document.getElementById(
+                "trackerModal"
+            ).style.display = "flex";
+
+        }
+
+        function updateTrackerRequest(requestId) {
+
+            const request =
+                trackerRequests.find(
+                    item =>
+                        String(item.request_id) ===
+                        String(requestId)
+                );
+
+            if (!request) {
+                return;
+            }
+
+            document.getElementById("updateRequestId").textContent =
+                request.request_id || "-";
+
+            document.getElementById("updateClientCode").textContent =
+                request.client_code || "-";
+
+            document.getElementById("updateCurrentStage").textContent =
+                request.current_stage || "Created";
+
+            document.getElementById("nextStageSelect").value =
+                "";
+
+            document.getElementById(
+                "updateTrackerModal"
+            ).style.display = "flex";
+        }
+
+        function closeUpdateTrackerModal() {
+
+            document.getElementById(
+                "updateTrackerModal"
+            ).style.display = "none";
+
+        }
+
+        function closeTrackerModal() {
+
+            document.getElementById(
+                "trackerModal"
+            ).style.display = "none";
+
+        }
+
+        function saveTrackerStage() {
+
+            const stage =
+                document.getElementById(
+                    "nextStageSelect"
+                ).value;
+
+            if (!stage) {
+
+                alert("Please select a stage.");
+
+                return;
+            }
+
+            const requestId =
+                document.getElementById(
+                    "updateRequestId"
+                ).textContent;
+
+            fetch(
+                `/api/tracker/${encodeURIComponent(requestId)}/stage`,
+                {
+                    method: "PUT",
+
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        stage: stage
+                    })
+                }
+            )
+                .then(response => {
+
+                    return response.json()
+                        .then(data => ({
+                            ok: response.ok,
+                            data: data
+                        }));
+
+                })
+
+                .then(result => {
+
+                    if (!result.ok) {
+
+                        alert(
+                            result.data.message ||
+                            "Failed to update tracker stage."
+                        );
+
+                        return;
+                    }
+
+                    const request =
+                        trackerRequests.find(
+                            item =>
+                                String(item.request_id) ===
+                                String(requestId)
+                        );
+
+                    if (request) {
+                        request.current_stage = stage;
+                        request.updated_at = new Date().toISOString();
+                    }
+
+                    const tableRows =
+                        document.querySelectorAll(
+                            "#trackerTableBody tr"
+                        );
+
+                    tableRows.forEach(row => {
+
+                        const rowRequestId =
+                            row.children[0]?.textContent.trim();
+
+                        if (
+                            String(rowRequestId) ===
+                            String(requestId)
+                        ) {
+                            row.children[2].innerHTML =
+                                `<strong>${escapeHtml(stage)}</strong>`;
+
+                            row.children[3].textContent =
+                                formatDate(new Date().toISOString());
+                        }
+
+                    });
+
+                    alert(
+                        result.data.message
+                    );
+
+                    closeUpdateTrackerModal();
+
+                })
+
+                .catch(error => {
+
+                    console.error(
+                        "Tracker update error:",
+                        error
+                    );
+
+                    alert(
+                        "Failed to update tracker stage."
+                    );
+
+                });
+
+        }
+
+        function formatDate(dateValue) {
+
+            if (!dateValue) {
+                return "-";
+            }
+
+            const value = String(dateValue).trim();
+
+            // PostgreSQL timestamp: date part is YYYY-MM-DD
+            const match = value.match(/^(\d{4})-(\d{2})-(\d{2})/);
+
+            if (!match) {
+                return value;
+            }
+
+            const year = match[1];
+            const month = match[2];
+            const day = match[3];
+
+            return `${day}-${month}-${year}`;
+        }
+
+
+        function escapeHtml(value) {
+
+            return String(value ?? "")
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+
+        }
+    </script>
+
+</body>
+
+</html>

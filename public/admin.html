@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Sample Request Automation</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            background: #f5f7fb;
+            color: #222;
+        }
+
+        .header {
+            background: white;
+            padding: 18px 30px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h2 {
+            margin: 0;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .card h3 {
+            margin-top: 0;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 7px;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 11px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        button {
+            padding: 11px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .primary-btn {
+            background: #2563eb;
+            color: white;
+        }
+
+        .primary-btn:hover {
+            background: #1d4ed8;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background: #f1f5f9;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 20px;
+            color: #777;
+        }
+
+        .message {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 6px;
+            display: none;
+        }
+
+        .success {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        @media (max-width: 700px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .full-width {
+                grid-column: auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <h2>Admin Panel</h2>
+        <span>Sample Request Automation</span>
+    </div>
+
+    <div class="container">
+
+        <!-- Add User -->
+        <div class="card">
+
+            <h3>Add New User</h3>
+
+            <form id="userForm">
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input type="text" id="name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>User ID</label>
+                        <input type="text" id="user_id" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Department</label>
+                        <select id="department" required>
+                            <option value="">Select Department</option>
+                            <option value="marketing">Marketing</option>
+                            <option value="sample">Sample Dept. / R&D</option>
+                            <option value="administration">Administration / Management</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Role</label>
+                        <select id="role" required disabled>
+                            <option value="">Select Role</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="email" required>
+                    </div>
+
+                    <div class="full-width">
+                        <button type="submit" class="primary-btn">
+                            Send Invitation
+                        </button>
+                    </div>
+
+                </div>
+
+            </form>
+
+            <div id="message" class="message"></div>
+
+        </div>
+
+
+        <!-- Users -->
+        <div class="card">
+
+            <h3>Users</h3>
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>User ID</th>
+                            <th>Department</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="usersTableBody">
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        const userForm =
+            document.getElementById("userForm");
+
+        const message =
+            document.getElementById("message");
+
+        const usersTableBody =
+            document.getElementById("usersTableBody");
+
+        const departmentSelect =
+            document.getElementById("department");
+
+        const roleSelect =
+            document.getElementById("role");
+
+
+        /*
+        =========================================================
+        DEPARTMENT ↔ ROLE MAPPING
+        =========================================================
+        */
+
+        const departmentRoleMap = {
+            marketing: [
+                {
+                    value: "merchant",
+                    label: "Merchant"
+                }
+            ],
+
+            sample: [
+                {
+                    value: "sampler",
+                    label: "Sampler"
+                }
+            ],
+
+            administration: [
+                {
+                    value: "admin",
+                    label: "Admin"
+                },
+                {
+                    value: "super_admin",
+                    label: "Super Admin"
+                }
+            ]
+        };
+
+
+        /*
+        =========================================================
+        UPDATE ROLE OPTIONS
+        =========================================================
+        */
+
+        function updateRoles() {
+
+            const department =
+                departmentSelect.value;
+
+            roleSelect.innerHTML =
+                '<option value="">Select Role</option>';
+
+            if (!department) {
+                roleSelect.disabled = true;
+                return;
+            }
+
+            const roles =
+                departmentRoleMap[department] || [];
+
+            roles.forEach(role => {
+
+                const option =
+                    document.createElement("option");
+
+                option.value = role.value;
+                option.textContent = role.label;
+
+                roleSelect.appendChild(option);
+
+            });
+
+            roleSelect.disabled = false;
+        }
+
+
+        /*
+        =========================================================
+        DEPARTMENT CHANGE
+        =========================================================
+        */
+
+        departmentSelect.addEventListener(
+            "change",
+            function () {
+
+                updateRoles();
+
+            }
+        );
+
+
+        function showMessage(text, type) {
+
+            message.textContent = text;
+
+            message.className =
+                "message " + type;
+
+            message.style.display = "block";
+
+        }
+
+
+        async function loadUsers() {
+
+            try {
+
+                const token =
+                    localStorage.getItem("token");
+
+                if (!token) {
+
+                    showMessage(
+                        "Admin login required.",
+                        "error"
+                    );
+
+                    return;
+                }
+
+                const response =
+                    await fetch("/api/admin/users", {
+                        headers: {
+                            "Authorization":
+                                "Bearer " + token
+                        }
+                    });
+
+                const data =
+                    await response.json();
+
+                if (!response.ok) {
+
+                    console.error(
+                        "Users API error:",
+                        data
+                    );
+
+                    showMessage(
+                        data.message ||
+                        "Unable to load users",
+                        "error"
+                    );
+
+                    return;
+                }
+
+                const users =
+                    Array.isArray(data) ? data : [];
+
+                usersTableBody.innerHTML = "";
+
+                if (users.length === 0) {
+
+                    usersTableBody.innerHTML = `
+                        <tr>
+                            <td colspan="7" class="empty">
+                                No users found
+                            </td>
+                        </tr>
+                    `;
+
+                    return;
+                }
+
+                users.forEach(user => {
+
+                    const row =
+                        document.createElement("tr");
+
+                    row.innerHTML = `
+                        <td>${user.name || ""}</td>
+                        <td>${user.user_id}</td>
+                        <td>${user.department || ""}</td>
+                        <td>${user.email || ""}</td>
+                        <td>${user.role || "USER"}</td>
+                        <td>${user.status || ""}</td>
+                        <td>
+                            <button
+                                type="button"
+                                onclick="deleteUser(${user.id})">
+                                Delete
+                            </button>
+                        </td>
+                    `;
+
+                    usersTableBody.appendChild(row);
+
+                });
+
+            } catch (error) {
+
+                console.error(
+                    "Load users error:",
+                    error
+                );
+
+                showMessage(
+                    "Unable to connect to server.",
+                    "error"
+                );
+
+            }
+        }
+
+
+        window.deleteUser = async function (id) {
+
+            const confirmed =
+                confirm(
+                    "Are you sure you want to delete this user?"
+                );
+
+            if (!confirmed) {
+                return;
+            }
+
+            try {
+
+                const token =
+                    localStorage.getItem("token");
+
+                const response =
+                    await fetch(
+                        `/api/admin/users/${id}`,
+                        {
+                            method: "DELETE",
+                            headers: {
+                                "Authorization":
+                                    "Bearer " + token
+                            }
+                        }
+                    );
+
+                const data =
+                    await response.json();
+
+                if (!response.ok) {
+
+                    showMessage(
+                        data.message ||
+                        "Unable to delete user",
+                        "error"
+                    );
+
+                    return;
+                }
+
+                showMessage(
+                    "User deleted successfully.",
+                    "success"
+                );
+
+                loadUsers();
+
+            } catch (error) {
+
+                console.error(
+                    "Delete user error:",
+                    error
+                );
+
+                showMessage(
+                    "Server connection failed.",
+                    "error"
+                );
+
+            }
+        };
+
+
+        window.editUser = async function (id) {
+
+            try {
+
+                const token =
+                    localStorage.getItem("token");
+
+                const response =
+                    await fetch(
+                        `/api/admin/users/${id}`,
+                        {
+                            headers: {
+                                "Authorization":
+                                    "Bearer " + token
+                            }
+                        }
+                    );
+
+                const data =
+                    await response.json();
+
+                if (!response.ok) {
+
+                    showMessage(
+                        data.message ||
+                        "Unable to load user",
+                        "error"
+                    );
+
+                    return;
+                }
+
+                document.getElementById("name").value =
+                    data.name || "";
+
+                document.getElementById("user_id").value =
+                    data.user_id || "";
+
+                /*
+                Set department first so that
+                the correct roles are loaded.
+                */
+
+                document.getElementById("department").value =
+                    data.department || "";
+
+                updateRoles();
+
+                document.getElementById("role").value =
+                    data.role || "";
+
+                document.getElementById("email").value =
+                    data.email || "";
+
+            } catch (error) {
+
+                console.error(
+                    "Edit user error:",
+                    error
+                );
+
+                showMessage(
+                    "Server connection failed.",
+                    "error"
+                );
+
+            }
+        };
+
+
+        userForm.addEventListener(
+            "submit",
+            async function (event) {
+
+                event.preventDefault();
+
+                const name =
+                    document.getElementById("name")
+                        .value.trim();
+
+                const user_id =
+                    document.getElementById("user_id")
+                        .value.trim();
+
+                const department =
+                    document.getElementById("department")
+                        .value;
+
+                const email =
+                    document.getElementById("email")
+                        .value.trim();
+
+                const role =
+                    document.getElementById("role")
+                        .value;
+
+
+                /*
+                Frontend mapping validation
+                */
+
+                const validRoles =
+                    departmentRoleMap[department] || [];
+
+                const isValidMapping =
+                    validRoles.some(
+                        item => item.value === role
+                    );
+
+                if (!isValidMapping) {
+
+                    showMessage(
+                        "Invalid Department and Role combination.",
+                        "error"
+                    );
+
+                    return;
+                }
+
+
+                try {
+
+                    const token =
+                        localStorage.getItem("token");
+
+                    const response =
+                        await fetch(
+                            "/api/admin/users",
+                            {
+                                method: "POST",
+
+                                headers: {
+                                    "Content-Type":
+                                        "application/json",
+
+                                    "Authorization":
+                                        "Bearer " + token
+                                },
+
+                                body: JSON.stringify({
+                                    name,
+                                    user_id,
+                                    department,
+                                    email,
+                                    role
+                                })
+                            }
+                        );
+
+
+                    const data =
+                        await response.json();
+
+
+                    if (!response.ok) {
+
+                        showMessage(
+                            data.message ||
+                            "Unable to create user",
+                            "error"
+                        );
+
+                        return;
+                    }
+
+
+                    showMessage(
+                        "User invitation created successfully.",
+                        "success"
+                    );
+
+
+                    userForm.reset();
+
+                    roleSelect.innerHTML =
+                        '<option value="">Select Role</option>';
+
+                    roleSelect.disabled = true;
+
+                    loadUsers();
+
+
+                } catch (error) {
+
+                    console.error(error);
+
+                    showMessage(
+                        "Server connection failed.",
+                        "error"
+                    );
+
+                }
+
+            }
+        );
+
+
+        loadUsers();
+
+    </script>
+
+</body>
+
+</html>
+

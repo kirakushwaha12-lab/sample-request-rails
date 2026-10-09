@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Sample Requests</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f6fa;
+            color: #222;
+        }
+
+        .container {
+            max-width: 1150px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 28px;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, .08);
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .page-title {
+            margin: 0;
+            font-size: 26px;
+        }
+
+        .back-btn {
+            border: 1px solid #ccc;
+            background: white;
+            padding: 9px 15px;
+            border-radius: 7px;
+            cursor: pointer;
+            text-decoration: none;
+            color: #222;
+        }
+
+        .search-area {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 22px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #d2d6dc;
+            border-radius: 7px;
+            font-size: 14px;
+        }
+
+        .status-filter {
+            width: 180px;
+            padding: 12px;
+            border: 1px solid #d2d6dc;
+            border-radius: 7px;
+            background: white;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #f1f2f5;
+            text-align: left;
+            padding: 13px;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 14px 13px;
+            border-bottom: 1px solid #eee;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        tr:hover td {
+            background: #fafafa;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 5px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 7px;
+        }
+
+        .action-btn {
+            border: none;
+            padding: 7px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .view-btn {
+            background: #eee;
+            color: #222;
+        }
+
+        .edit-btn {
+            background: #222;
+            color: white;
+        }
+
+        .delete-btn {
+            background: #f0dede;
+            color: #9b2226;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: #777;
+            display: none;
+        }
+
+        .loading-state {
+            text-align: center;
+            padding: 30px 20px;
+            color: #777;
+        }
+
+        .error-state {
+            text-align: center;
+            padding: 30px 20px;
+            color: #9b2226;
+            display: none;
+        }
+
+        .subtitle {
+            color: #777;
+            margin-bottom: 28px;
+        }
+
+        /* Center align Articles, Status and Action */
+
+        table th:nth-child(3),
+        table td:nth-child(3),
+        table th:nth-child(4),
+        table td:nth-child(4),
+        table th:nth-child(5),
+        table td:nth-child(5),
+        table th:nth-child(6),
+        table td:nth-child(6) {
+            text-align: center;
+        }
+
+        @media (max-width: 650px) {
+
+            .card {
+                padding: 18px;
+            }
+
+            .page-header {
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .page-title {
+                font-size: 21px;
+            }
+
+            .search-area {
+                flex-direction: column;
+            }
+
+            .status-filter {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <div class="card">
+
+            <div class="page-header">
+
+                <h1 class="page-title">
+                    Sample Requests
+                </h1>
+
+                <a href="dashboard1.html" class="back-btn">
+                    ← Dashboard
+                </a>
+
+            </div>
+
+            <div class="subtitle">
+                Manage Sample Requests
+            </div>
+
+            <div class="search-area">
+
+                <input type="text" id="searchInput" class="search-input" placeholder="Search Request ID / Client Code">
+
+                <select id="statusFilter" class="status-filter">
+
+                    <option value="ALL">
+                        ALL STATUS
+                    </option>
+
+                    <option value="SUBMITTED">
+                        SUBMITTED
+                    </option>
+
+                    <option value="UPDATED">
+                        UPDATED
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div id="loadingState" class="loading-state">
+                Loading sample requests...
+            </div>
+
+
+            <div id="errorState" class="error-state">
+                Failed to load sample requests.
+            </div>
+
+
+            <div class="table-wrapper">
+
+                <table id="requestsTableWrapper" style="display:none;">
+
+                    <thead>
+
+                        <tr>
+                            <th>Request ID</th>
+                            <th>Client Code</th>
+                            <th>Inquiry Received</th>
+                            <th>No. of Articles</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="requestsTable"></tbody>
+
+                </table>
+
+            </div>
+
+
+            <div id="emptyState" class="empty-state">
+                No sample requests found.
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        /* =====================================================
+           API
+        ===================================================== */
+
+        const API_BASE_URL =
+            "http://localhost:3000/api/sample-requests";
+
+
+        /* =====================================================
+           REQUEST DATA
+        ===================================================== */
+
+        let requests = [];
+
+
+        /* =====================================================
+           FORMAT DATE
+        ===================================================== */
+
+        function formatDate(dateValue) {
+
+            if (!dateValue) {
+                return "-";
+            }
+
+            const cleanDate =
+                String(dateValue).split("T")[0];
+
+            const parts =
+                cleanDate.split("-");
+
+            if (parts.length !== 3) {
+                return cleanDate;
+            }
+
+            return `${parts[2]}-${parts[1]}-${parts[0]}`;
+
+        }
+        /* =====================================================
+           ESCAPE HTML
+        ===================================================== */
+
+        function escapeHtml(value) {
+
+            return String(value ?? "")
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+
+        }
+
+
+        /* =====================================================
+           STATUS
+        ===================================================== */
+
+        function getStatus(request) {
+
+            const status =
+                String(
+                    request.status || "SUBMITTED"
+                )
+                    .trim()
+                    .toUpperCase();
+
+            if (status === "UPDATED") {
+                return "UPDATED";
+            }
+
+            return "SUBMITTED";
+
+        }
+
+
+        /* =====================================================
+           CONVERT SQL REQUEST TO FRONTEND FORMAT
+        ===================================================== */
+        let currentUserRole = "";
+        function convertRequest(request) {
+
+            if (!request) {
+                return null;
+            }
+
+            return {
+
+                id: request.id,
+
+                requestId:
+                    request.request_id || "",
+
+                clientCode:
+                    request.client_code || "",
+
+                inquiryReceivedDate:
+                    request.inquiry_received_date
+                        ? String(request.inquiry_received_date)
+                            .split("T")[0]
+                        : "",
+
+                status:
+                    request.status || "SUBMITTED",
+
+                createdBy:
+                    request.created_by || null,
+
+                createdAt:
+                    request.created_at || null,
+
+                userId:
+                    request.user_id || "",
+
+                name:
+                    request.name || "",
+
+                department:
+                    request.department || "",
+
+                articles:
+                    Array.isArray(request.articles)
+                        ? request.articles
+                        : []
+
+            };
+
+        }
+
+
+        /* =====================================================
+           LOAD ALL REQUESTS FROM SQL
+        ===================================================== */
+
+        async function loadRequests() {
+
+            const loading =
+                document.getElementById("loadingState");
+
+            const error =
+                document.getElementById("errorState");
+
+            const tableWrapper =
+                document.getElementById(
+                    "requestsTableWrapper"
+                );
+
+
+            try {
+
+                loading.style.display = "block";
+
+                error.style.display = "none";
+
+                tableWrapper.style.display = "none";
+
+
+                const token = localStorage.getItem("token");
+
+                const userResponse = await fetch(
+                    "/api/auth/me",
+                    {
+                        headers: {
+                            "Authorization": `Bearer ${token}`
+                        }
+                    }
+                );
+
+                if (userResponse.ok) {
+                    const userData = await userResponse.json();
+
+                    console.log("AUTH ME USER:", userData);
+
+                    currentUserRole =
+                        (userData.user.role || "").toLowerCase();
+
+                    console.log("CURRENT USER ROLE:", currentUserRole);
+                }
+
+                const response = await fetch(API_BASE_URL, {
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    }
+                });
+                if (!response.ok) {
+
+                    throw new Error(
+                        "Failed to load requests"
+                    );
+
+                }
+
+
+                const data =
+                    await response.json();
+
+
+                requests =
+                    Array.isArray(data)
+                        ? data.map(convertRequest)
+                        : [];
+
+
+                /*
+                 * Current backend list API returns
+                 * request information but not articles.
+                 *
+                 * Fetch complete SQL record for each request
+                 * so article count remains correct without
+                 * changing the existing backend functioning.
+                 */
+
+                const completeRequests =
+                    await Promise.all(
+
+                        requests.map(
+                            async request => {
+
+                                try {
+
+                                    const detailResponse =
+                                        await fetch(
+                                            API_BASE_URL +
+                                            "/" +
+                                            encodeURIComponent(
+                                                request.requestId
+                                            )
+                                        );
+
+
+                                    if (!detailResponse.ok) {
+                                        return request;
+                                    }
+
+
+                                    const detail =
+                                        await detailResponse.json();
+
+
+                                    return convertRequest(
+                                        detail
+                                    );
+
+                                } catch (errorObject) {
+
+                                    console.error(
+                                        "Request detail error:",
+                                        errorObject
+                                    );
+
+                                    return request;
+
+                                }
+
+                            }
+                        )
+
+                    );
+
+
+                requests =
+                    completeRequests;
+
+
+                loading.style.display = "none";
+
+                tableWrapper.style.display = "table";
+
+
+                displayRequests();
+
+
+            } catch (errorObject) {
+
+                console.error(
+                    "Load sample requests error:",
+                    errorObject
+                );
+
+
+                loading.style.display = "none";
+
+                tableWrapper.style.display = "none";
+
+                error.style.display = "block";
+
+                error.textContent =
+                    "Failed to load sample requests. Make sure the backend is running.";
+
+            }
+
+        }
+
+
+        /* =====================================================
+           DISPLAY REQUESTS
+        ===================================================== */
+
+        function displayRequests() {
+
+            const table =
+                document.getElementById(
+                    "requestsTable"
+                );
+
+            const empty =
+                document.getElementById(
+                    "emptyState"
+                );
+
+
+            const search =
+                document
+                    .getElementById("searchInput")
+                    .value
+                    .trim()
+                    .toLowerCase();
+
+
+            const selectedStatus =
+                document
+                    .getElementById("statusFilter")
+                    .value
+                    .toUpperCase();
+
+
+            const filteredRequests =
+                requests.filter(request => {
+
+
+                    const requestId =
+                        String(
+                            request.requestId || ""
+                        ).toLowerCase();
+
+
+                    const clientCode =
+                        String(
+                            request.clientCode || ""
+                        ).toLowerCase();
+
+
+                    const status =
+                        getStatus(request);
+
+
+                    const searchMatch =
+                        requestId.includes(search) ||
+                        clientCode.includes(search);
+
+
+                    const statusMatch =
+                        selectedStatus === "ALL" ||
+                        status === selectedStatus;
+
+
+                    return (
+                        searchMatch &&
+                        statusMatch
+                    );
+
+                });
+
+
+            table.innerHTML = "";
+
+
+            if (filteredRequests.length === 0) {
+
+                empty.style.display = "block";
+
+                return;
+
+            }
+
+
+            empty.style.display = "none";
+
+
+            filteredRequests.forEach(request => {
+
+                const row =
+                    document.createElement("tr");
+
+
+                const requestId =
+                    request.requestId || "-";
+
+
+                const clientCode =
+                    request.clientCode || "-";
+
+
+                const inquiryDate =
+                    formatDate(
+                        request.inquiryReceivedDate
+                    );
+
+
+                const articleCount =
+                    Array.isArray(request.articles)
+                        ? request.articles.length
+                        : 0;
+
+
+                const status =
+                    getStatus(request);
+
+
+                row.innerHTML = `
+
+            <td>
+                ${escapeHtml(requestId)}
+            </td>
+
+            <td>
+                ${escapeHtml(clientCode)}
+            </td>
+
+            <td>
+                ${escapeHtml(inquiryDate)}
+            </td>
+
+            <td>
+                ${articleCount}
+            </td>
+
+            <td>
+                <span class="status">
+                    ${escapeHtml(status)}
+                </span>
+            </td>
+
+            <td>
+
+                <div class="action-buttons">
+
+                    <button
+                        type="button"
+                        class="action-btn view-btn"
+                        data-request-id="${escapeHtml(requestId)}"
+                        onclick="viewRequest(this.dataset.requestId)"
+                    >
+                        VIEW
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="action-btn edit-btn"
+                        data-request-id="${escapeHtml(requestId)}"
+                        onclick="editRequest(this.dataset.requestId)"
+                    >
+                        EDIT
+                    </button>
+
+
+                    ${currentUserRole === "super_admin" ? `
+                        <button
+                            type="button"
+                            class="action-btn delete-btn"
+                            data-request-id="${escapeHtml(requestId)}"
+                            onclick="deleteRequest(this.dataset.requestId)"
+                        >
+                            DELETE
+                        </button>
+                    ` : ""}
+
+                </div>
+
+            </td>
+
+        `;
+
+
+                table.appendChild(row);
+
+            });
+
+        }
+
+
+        /* =====================================================
+           FIND REQUEST
+        ===================================================== */
+
+        function findRequest(requestId) {
+
+            return requests.find(
+                request =>
+                    String(request.requestId) ===
+                    String(requestId)
+            );
+
+        }
+
+
+        /* =====================================================
+           GET COMPLETE REQUEST FROM SQL
+        ===================================================== */
+
+        async function getCompleteRequest(requestId) {
+
+            const response =
+                await fetch(
+                    API_BASE_URL +
+                    "/" +
+                    encodeURIComponent(requestId)
+                );
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Request not found"
+                );
+
+            }
+
+
+            const data =
+                await response.json();
+
+
+            return convertRequest(data);
+
+        }
+
+
+        /* =====================================================
+           VIEW
+        ===================================================== */
+
+        async function viewRequest(requestId) {
+
+            try {
+
+                /*
+                 * Get latest complete data directly
+                 * from PostgreSQL.
+                 */
+
+                const request =
+                    await getCompleteRequest(
+                        requestId
+                    );
+
+
+                /*
+                 * Temporary page-to-page handoff.
+                 * SQL remains the actual data source.
+                 */
+
+                localStorage.setItem(
+                    "selectedSampleRequest",
+                    JSON.stringify(request)
+                );
+
+
+                window.location.href =
+                    "sample request sheet2.html";
+
+
+            } catch (errorObject) {
+
+                console.error(
+                    "View request error:",
+                    errorObject
+                );
+
+
+                alert(
+                    "Request not found."
+                );
+
+            }
+
+        }
+
+
+        /* =====================================================
+           EDIT
+        ===================================================== */
+
+        async function editRequest(requestId) {
+
+            try {
+
+                const request =
+                    await getCompleteRequest(requestId);
+
+                if (!request || !request.requestId) {
+                    throw new Error("Request not found");
+                }
+
+                window.location.href =
+                    "sample request2.html?edit=" +
+                    encodeURIComponent(request.requestId);
+
+            } catch (errorObject) {
+
+                console.error(
+                    "Edit request error:",
+                    errorObject
+                );
+
+                alert(
+                    "Request not found."
+                );
+
+            }
+
+        }
+
+        /* =====================================================
+           DELETE
+        ===================================================== */
+
+        async function deleteRequest(requestId) {
+
+            const request =
+                findRequest(requestId);
+
+
+            if (!request) {
+
+                alert(
+                    "Request not found."
+                );
+
+                return;
+
+            }
+
+
+            const confirmed =
+                confirm(
+                    "Are you sure you want to delete this request?"
+                );
+
+
+            if (!confirmed) {
+                return;
+            }
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        API_BASE_URL +
+                        "/" +
+                        encodeURIComponent(
+                            requestId
+                        ),
+                        {
+                            method: "DELETE"
+                        }
+                    );
+
+
+                const result =
+                    await response.json();
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        result.message ||
+                        "Failed to delete request"
+                    );
+
+                }
+
+
+                alert(
+                    "Sample request deleted successfully."
+                );
+
+
+                /*
+                 * Reload directly from SQL
+                 */
+
+                await loadRequests();
+
+
+            } catch (errorObject) {
+
+                console.error(
+                    "Delete request error:",
+                    errorObject
+                );
+
+
+                alert(
+                    "Failed to delete sample request."
+                );
+
+            }
+
+        }
+
+
+        /* =====================================================
+           SEARCH
+        ===================================================== */
+
+        document
+            .getElementById("searchInput")
+            .addEventListener(
+                "input",
+                displayRequests
+            );
+
+
+        /* =====================================================
+           STATUS FILTER
+        ===================================================== */
+
+        document
+            .getElementById("statusFilter")
+            .addEventListener(
+                "change",
+                displayRequests
+            );
+
+
+        /* =====================================================
+           LOAD
+        ===================================================== */
+        /* =====================================================
+          EMAIL VIEW LINK
+        ===================================================== */
+
+        const viewRequestId =
+            new URLSearchParams(window.location.search).get("view");
+
+        if (viewRequestId) {
+            viewRequest(viewRequestId);
+        } else {
+            loadRequests();
+        }
+
+
+        /* =====================================================
+          PAGE SHOW
+        ===================================================== */
+
+        window.addEventListener(
+            "pageshow",
+            () => {
+
+                if (!viewRequestId) {
+                    loadRequests();
+                }
+
+            }
+        );
+
+
+    </script>
+
+</body>
+
+</html>

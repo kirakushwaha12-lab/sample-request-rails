@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sample Request Form - Login</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #f4f6f8;
+    }
+
+    .login-box {
+      width: 360px;
+      background: white;
+      padding: 35px;
+      border-radius: 12px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 28px;
+      font-size: 14px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 7px;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 18px;
+      border: 1px solid #ccc;
+      border-radius: 7px;
+      font-size: 15px;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #555;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 7px;
+      background: #222;
+      color: white;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #444;
+    }
+
+    #message {
+      margin-top: 15px;
+      text-align: center;
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="login-box">
+
+    <h1>Sample Request Form</h1>
+
+    <p class="subtitle">Login to continue</p>
+
+    <form id="loginForm">
+
+      <label for="user_id">Login ID</label>
+
+      <input type="text" id="user_id" placeholder="Enter Login ID" required>
+
+      <label for="password">Password</label>
+
+      <input type="password" id="password" placeholder="Enter Password" required>
+
+      <button type="submit">Login</button>
+
+    </form>
+
+    <div id="message"></div>
+
+  </div>
+
+  <script>
+    const loginForm = document.getElementById("loginForm");
+    const message = document.getElementById("message");
+
+    loginForm.addEventListener("submit", async function (event) {
+      event.preventDefault();
+
+      const user_id = document
+        .getElementById("user_id")
+        .value
+        .trim();
+
+      const password = document.getElementById("password").value;
+
+      message.textContent = "Logging in...";
+
+      try {
+        const response = await fetch(
+          "http://localhost:3000/api/auth/login",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              user_id,
+              password
+            })
+          }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          message.textContent =
+            data.message || "Login failed";
+          return;
+        }
+
+        localStorage.setItem("token", data.token);
+
+        localStorage.setItem(
+          "user",
+          JSON.stringify(data.user)
+        );
+
+        message.textContent = "Login successful!";
+
+        setTimeout(() => {
+          window.location.href = "dashboard1.html";
+        }, 500);
+
+      } catch (error) {
+        console.error("Login error:", error);
+
+        message.textContent =
+          "Unable to connect to server.";
+      }
+    });
+  </script>
+
+</body>
+
+</html>

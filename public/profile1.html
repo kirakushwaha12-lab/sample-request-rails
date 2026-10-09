@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>My Profile</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f6fa;
+      color: #222;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    .profile-card {
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, .08);
+    }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .page-title {
+      margin: 0;
+      font-size: 26px;
+    }
+
+    .back-btn {
+      border: 1px solid #ccc;
+      background: white;
+      padding: 9px 15px;
+      border-radius: 7px;
+      text-decoration: none;
+      color: #222;
+      font-size: 14px;
+    }
+
+    .profile-header {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      padding-bottom: 25px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .avatar {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: #222;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 27px;
+      font-weight: 700;
+    }
+
+    .profile-name {
+      margin: 0 0 6px;
+      font-size: 22px;
+    }
+
+    .profile-department {
+      margin: 0;
+      color: #777;
+      font-size: 14px;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin: 28px 0 18px;
+      padding-bottom: 9px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .profile-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .info-box {
+      padding: 15px;
+      border: 1px solid #e1e1e1;
+      border-radius: 8px;
+      background: #fafafa;
+    }
+
+    .info-label {
+      font-size: 12px;
+      color: #777;
+      margin-bottom: 6px;
+    }
+
+    .info-value {
+      font-size: 15px;
+      font-weight: 600;
+      word-break: break-word;
+    }
+
+    @media (max-width: 650px) {
+
+      .profile-card {
+        padding: 20px;
+      }
+
+      .page-header {
+        align-items: flex-start;
+        gap: 15px;
+      }
+
+      .page-title {
+        font-size: 21px;
+      }
+
+      .profile-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <div class="profile-card">
+
+      <!-- HEADER -->
+
+      <div class="page-header">
+
+        <h1 class="page-title">
+          My Profile
+        </h1>
+
+        <a href="dashboard1.html" class="back-btn">
+          ← Dashboard
+        </a>
+
+      </div>
+
+
+      <!-- PROFILE HEADER -->
+
+      <div class="profile-header">
+
+        <div class="avatar" id="avatar">
+          U
+        </div>
+
+        <div>
+
+          <h2 class="profile-name" id="profileName">
+            User
+          </h2>
+
+          <p class="profile-department" id="profileDepartment">
+            -
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <!-- PROFILE INFORMATION -->
+
+      <div class="section-title">
+        Profile Information
+      </div>
+
+
+      <div class="profile-grid">
+
+        <div class="info-box">
+
+          <div class="info-label">
+            Name
+          </div>
+
+          <div class="info-value" id="name">
+            -
+          </div>
+
+        </div>
+
+
+        <div class="info-box">
+
+          <div class="info-label">
+            User ID
+          </div>
+
+          <div class="info-value" id="userId">
+            -
+          </div>
+
+        </div>
+
+
+        <div class="info-box">
+
+          <div class="info-label">
+            Department
+          </div>
+
+          <div class="info-value" id="department">
+            -
+          </div>
+
+        </div>
+
+        <div class="info-box">
+
+          <div class="info-label">
+            Role
+          </div>
+
+          <div class="info-value" id="role">
+            -
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+      <div class="section-title">
+        Account Security
+      </div>
+
+      <div style="margin-top: 10px;">
+        <button type="button" onclick="resetPassword()" style="
+      padding: 10px 16px;
+      border: none;
+      border-radius: 7px;
+      background: #222;
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+    ">
+          Reset Password
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <script>
+
+      function getLoggedInUser() {
+
+        const token = localStorage.getItem("token");
+        const savedUser = localStorage.getItem("user");
+
+        if (!token || !savedUser) {
+          window.location.href = "login1.html";
+          return {};
+        }
+
+        try {
+
+          const user = JSON.parse(savedUser);
+
+          if (user && typeof user === "object") {
+            return user;
+          }
+
+        } catch (error) {
+
+          console.error("Invalid user data:", error);
+
+        }
+
+        return {};
+      }
+
+
+      function getValue(user, key) {
+
+        if (
+          user[key] !== undefined &&
+          user[key] !== null &&
+          String(user[key]).trim() !== ""
+        ) {
+          return String(user[key]);
+        }
+
+        return "-";
+      }
+
+
+      function loadProfile() {
+
+        const user = getLoggedInUser();
+
+        const name = getValue(user, "name");
+        const userId = getValue(user, "user_id");
+        const department = getValue(user, "department");
+        const role = getValue(user, "role");
+
+        document.getElementById("name").textContent = name;
+        document.getElementById("userId").textContent = userId;
+        document.getElementById("department").textContent = department;
+        document.getElementById("role").textContent = role;
+
+        document.getElementById("profileName").textContent = name;
+        document.getElementById("profileDepartment").textContent = department;
+
+        const firstLetter =
+          name !== "-"
+            ? name.trim().charAt(0).toUpperCase()
+            : userId !== "-"
+              ? userId.trim().charAt(0).toUpperCase()
+              : "U";
+
+        document.getElementById("avatar").textContent = firstLetter;
+      }
+
+
+      function resetPassword() {
+
+        const currentPassword =
+          prompt("Enter current password:");
+
+        if (currentPassword === null) return;
+
+        const newPassword =
+          prompt("Enter new password:");
+
+        if (newPassword === null) return;
+
+        const confirmPassword =
+          prompt("Confirm new password:");
+
+        if (confirmPassword === null) return;
+
+        if (newPassword !== confirmPassword) {
+
+          alert("New passwords do not match.");
+          return;
+
+        }
+
+        if (newPassword.length < 6) {
+
+          alert("New password must be at least 6 characters.");
+          return;
+
+        }
+
+        const token =
+          localStorage.getItem("token");
+
+        if (!token) {
+
+          alert("Session expired. Please login again.");
+          window.location.href = "login1.html";
+          return;
+
+        }
+
+        fetch(
+          "http://localhost:3000/api/auth/reset-password",
+          {
+            method: "PUT",
+
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": "Bearer " + token
+            },
+
+            body: JSON.stringify({
+              currentPassword: currentPassword,
+              newPassword: newPassword
+            })
+          }
+        )
+          .then(async response => {
+
+            const data = await response.json();
+
+            if (!response.ok) {
+              throw new Error(
+                data.message ||
+                "Failed to reset password."
+              );
+            }
+
+            return data;
+
+          })
+          .then(data => {
+
+            alert(
+              data.message ||
+              "Password changed successfully."
+            );
+
+          })
+          .catch(error => {
+
+            console.error(
+              "Reset password error:",
+              error
+            );
+
+            alert(error.message);
+
+          });
+
+      }
+
+
+      loadProfile();
+
+    </script>
+</body>
+
+</html>

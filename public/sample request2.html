@@ -1,0 +1,2947 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sample Request</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f6fa;
+            color: #222;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .form-card {
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, .08);
+        }
+
+        h1 {
+            margin: 0 0 6px;
+        }
+
+        .subtitle {
+            color: #777;
+            margin-bottom: 28px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin: 28px 0 18px;
+            padding-bottom: 9px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .article-box {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 22px;
+            margin-bottom: 20px;
+            background: #fafafa;
+        }
+
+        .article-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .article-title {
+            font-size: 17px;
+            font-weight: 700;
+        }
+
+        .remove-article {
+            border: none;
+            background: #eee;
+            padding: 7px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .form-group {
+            margin-bottom: 17px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 7px;
+        }
+
+        input {
+            width: 100%;
+            padding: 11px 12px;
+            border: 1px solid #d2d6dc;
+            border-radius: 7px;
+            font-size: 14px;
+            background: white;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #555;
+        }
+
+        .readonly {
+            background: #eee;
+        }
+
+        .material-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        /* MULTI SELECT */
+
+        .multi-select-box {
+            position: relative;
+            width: 100%;
+        }
+
+        .multi-select-button {
+            width: 100%;
+            min-height: 42px;
+            padding: 11px 12px;
+            border: 1px solid #d2d6dc;
+            border-radius: 7px;
+            background: white;
+            cursor: pointer;
+            text-align: left;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .multi-select-button::after {
+            content: "▼";
+            float: right;
+            font-size: 9px;
+            margin-top: 3px;
+        }
+
+        .multi-select-dropdown {
+            display: none;
+            position: absolute;
+            z-index: 1000;
+            top: calc(100% + 4px);
+            left: 0;
+            width: 100%;
+            max-height: 240px;
+            overflow-y: auto;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 7px;
+            box-shadow: 0 5px 18px rgba(0, 0, 0, .15);
+            padding: 7px;
+        }
+
+        .multi-select-box.open .multi-select-dropdown {
+            display: block;
+        }
+
+        .multi-option {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            padding: 9px 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: normal;
+            margin: 0;
+        }
+
+        .multi-option:hover {
+            background: #f3f3f3;
+        }
+
+        .multi-option input {
+            width: auto;
+            margin-top: 2px;
+            cursor: pointer;
+        }
+
+        /* MULTI SELECT SEARCH */
+
+        .multi-select-search {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 9px 10px;
+            margin-bottom: 6px;
+            border: 1px solid #d2d6dc;
+            border-radius: 6px;
+            outline: none;
+            font-size: 13px;
+            background: white;
+        }
+
+        .multi-select-search:focus {
+            border-color: #999;
+        }
+
+        /* IMAGES */
+
+        .image-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 14px;
+        }
+
+        .image-card {
+            width: 125px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 6px;
+            background: white;
+        }
+
+        .image-wrapper {
+            position: relative;
+            width: 111px;
+            height: 95px;
+            overflow: hidden;
+            border-radius: 6px;
+            background: #eee;
+        }
+
+        .image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .remove-image {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 24px;
+            height: 24px;
+            border: none;
+            border-radius: 50%;
+            background: #222;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .image-name {
+            margin-top: 5px;
+            font-size: 10px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .image-size {
+            font-size: 10px;
+            color: #777;
+            margin-top: 2px;
+        }
+
+        .image-count {
+            margin-top: 7px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* BUTTONS */
+
+        .add-article-btn {
+            width: 100%;
+            padding: 12px;
+            border: 1px dashed #999;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            background: #222;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .submit-btn:disabled {
+            opacity: .6;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 650px) {
+            .form-card {
+                padding: 20px;
+            }
+
+            .material-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .article-type {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            background: white;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        /* CLIENT CODE AND ARTICLE NO DROPDOWNS */
+
+        /* CLIENT CODE AND ARTICLE NO DROPDOWNS */
+
+        #ClientCode,
+        #articleNo,
+        .article-no {
+            width: 100%;
+            min-height: 42px;
+            padding: 11px 12px;
+            border: 1px solid #d2d6dc;
+            border-radius: 7px;
+            background: #fff;
+            color: #222;
+            font-size: 14px;
+            cursor: pointer;
+            outline: none;
+        }
+
+        #ClientCode:focus,
+        #articleNo:focus,
+        .article-no:focus {
+            border-color: #555;
+            box-shadow: 0 0 0 2px rgba(85, 85, 85, 0.12);
+        }
+
+        #ClientCode:disabled,
+        #articleNo:disabled,
+        .article-no:disabled {
+            background: #eee;
+            color: #777;
+            cursor: not-allowed;
+        }
+
+        .client-code-wrapper,
+        .custom-input-wrapper {
+            position: relative;
+            z-index: 1;
+        }
+
+        .custom-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            display: none;
+            max-height: 220px;
+            overflow-y: auto;
+            background: #fff;
+            border: 1px solid #d2d6dc;
+            border-radius: 7px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+        }
+
+        .custom-dropdown div {
+            padding: 10px 12px;
+            background: #fff;
+            color: #222;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .custom-dropdown div:hover {
+            background: #f0f0f0;
+        }
+
+        .custom-input-wrapper input {
+            padding-right: 35px;
+        }
+
+        .dropdown-arrow {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #555;
+            font-size: 12px;
+            pointer-events: none;
+        }
+
+        .back-btn {
+            border: 1px solid #ccc;
+            background: white;
+            padding: 9px 15px;
+            border-radius: 7px;
+            cursor: pointer;
+            text-decoration: none;
+            color: #222;
+        }
+
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="form-card">
+
+            <div class="page-header">
+                <h1>Sample Request</h1>
+
+                <button class="back-btn" onclick="goBack()">
+                    ← Dashboard
+                </button>
+            </div>
+
+            <div class="subtitle" id="formSubtitle">
+                Create Sample Request
+            </div>
+
+            <form id="sampleRequestForm">
+
+                <div class="section-title">
+                    Request Information
+                </div>
+
+                <div class="form-group client-code-wrapper">
+                    <label for="ClientCode">Client Code</label>
+
+                    <div class="custom-input-wrapper">
+                        <input type="text" id="ClientCode" name="client_id" placeholder="Select or type Client Code"
+                            autocomplete="off" required>
+
+                        <span class="dropdown-arrow">▼</span>
+                    </div>
+
+                    <div id="clientCodeDropdown" class="custom-dropdown"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="inquiryReceivedDate">
+                        Inquiry Received Date
+                    </label>
+
+                    <input type="date" id="inquiryReceivedDate" required>
+                </div>
+
+                <div class="section-title">
+                    Articles
+                </div>
+
+                <div id="articlesContainer"></div>
+
+                <button type="button" class="add-article-btn" id="addArticleBtn">
+                    + Add Article
+                </button>
+
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    Submit
+                </button>
+
+            </form>
+
+        </div>
+    </div>
+
+    <script>
+
+        /* =========================================================
+           API
+        ========================================================= */
+
+        const API_BASE =
+            "http://localhost:3000/api/sample-requests";
+
+        console.log("🔥 API BASE:", API_BASE);
+        /* =========================================================
+           EDIT MODE
+        ========================================================= */
+
+        const urlParams =
+            new URLSearchParams(
+                window.location.search
+            );
+
+        const editRequestId =
+            urlParams.get("edit");
+
+        const isEditMode =
+            Boolean(editRequestId);
+
+        let editingRequest = null;
+
+
+        /* =========================================================
+           CLIENT CODE
+        ========================================================= */
+
+
+
+        /* =========================================================
+           EDIT UI
+        ========================================================= */
+
+        if (isEditMode) {
+
+            document.getElementById(
+                "formSubtitle"
+            ).textContent =
+                "Edit Sample Request";
+
+            document.getElementById(
+                "submitBtn"
+            ).textContent =
+                "Update";
+        }
+
+
+        /* =========================================================
+           DROPDOWN OPTIONS
+        ========================================================= */
+
+        let dropdownData = {};
+
+        async function loadDropdownData() {
+            try {
+                const response = await fetch(
+                    "http://localhost:3000/api/dropdown-options"
+                );
+
+                if (!response.ok) {
+                    throw new Error(
+                        `Failed to load dropdown options: ${response.status}`
+                    );
+                }
+
+                dropdownData = await response.json();
+
+                console.log(
+                    "✅ Dropdown data loaded:",
+                    dropdownData
+                );
+
+            } catch (error) {
+                console.error(
+                    "❌ Dropdown load error:",
+                    error
+                );
+
+                alert(
+                    "Failed to load dropdown options. Check backend."
+                );
+            }
+        }
+
+        const multipleSelectFields = [
+            "leather",
+            "lining",
+            "hardware",
+            "thread",
+            "hardware finish",
+            "webbing",
+            "zipper"
+
+        ];
+
+
+        /* =========================================================
+           CREATE MULTI SELECT
+        ========================================================= */
+        function createMultiSelect(fieldName) {
+            const options = dropdownData[fieldName] || [];
+
+            return `
+                <div class="multi-select-box" data-field="${fieldName}">
+                    <button type="button" class="multi-select-button">SELECT</button>
+
+                    <div class="multi-select-dropdown">
+
+                        <input
+                             type="text"
+                             class="multi-select-search"
+                             placeholder="Search ${fieldName}..."
+                             autocomplete="off"
+                        >
+
+                        <div class="multi-select-options">
+                            ${options.map(option => `
+                                <label class="multi-option">
+                                    <input type="checkbox" value="${option}">
+                                    <span>${option}</span>
+                               </label>
+                           `).join("")}
+                       </div>
+
+                   </div>
+               </div>
+            `;
+        }
+        /* =========================================================
+           ARTICLE DATA
+        ========================================================= */
+
+        let articleCounter = 0;
+
+        const articleFiles = {};
+
+
+        /* =========================================================
+           ADD ARTICLE
+        ========================================================= */
+
+        function addArticle(existingArticle = null) {
+
+            // Lowest available Article ID find karo
+            const existingIds = [
+                ...document.querySelectorAll(".article-box")
+            ].map(box => Number(box.dataset.articleId));
+
+            let id = 1;
+
+            while (existingIds.includes(id)) {
+                id++;
+            }
+            articleFiles[id] = {
+                branding: [],
+                reference: []
+            };
+
+
+            const articleBox =
+                document.createElement("div");
+
+            articleBox.className =
+                "article-box";
+
+            articleBox.dataset.articleId =
+                id;
+
+
+            articleBox.innerHTML = `
+
+        <div class="article-header">
+
+            <div class="article-title">
+                Article ${id}
+            </div>
+
+            ${id > 1
+                    ?
+                    `
+                <button
+                    type="button"
+                    class="remove-article"
+                    onclick="removeArticle(${id})"
+                >
+                    Remove Article
+                </button>
+                `
+                    :
+                    ""
+                }
+
+        </div>
+        
+        <div class="form-group article-no-wrapper">
+            <label for="articleNo">Article No.</label>
+
+           <div class="custom-input-wrapper">
+               <input
+                   type="text"
+                   id="articleNo"
+                   class="article-no"
+                   name="article_no"
+                   placeholder="Select or type Article No."
+                   autocomplete="off"
+                   required
+                >
+
+                <span class="dropdown-arrow">▼</span>
+
+            <div class="custom-dropdown article-no-dropdown"></div>
+        </div>
+    </div>   
+        
+        <div class="form-group">
+
+            <label>
+                Article Type
+            </label>
+
+            <select class="article-type" required>
+                <option value="">Select Article Type</option>
+                <option value="Existing">Existing</option>
+                <option value="Reference">Reference</option>
+                <option value="New">New</option>
+            </select>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Leather</label>
+
+            <div class="material-row">
+
+                ${createMultiSelect("leather")}
+
+                <input
+                    type="text"
+                    class="leather-free"
+                    placeholder="Enter Leather manually"
+                >
+
+            </div>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Lining</label>
+
+            <div class="material-row">
+
+                ${createMultiSelect("lining")}
+
+                <input
+                    type="text"
+                    class="lining-free"
+                    placeholder="Enter Lining manually"
+                >
+
+            </div>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Hardware</label>
+
+            <div class="material-row">
+
+                ${createMultiSelect("hardware")}
+
+                <input
+                    type="text"
+                    class="hardware-free"
+                    placeholder="Enter Hardware manually"
+                >
+
+            </div>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Thread</label>
+
+            <div class="material-row">
+
+                ${createMultiSelect("thread")}
+
+                <input
+                    type="text"
+                    class="thread-free"
+                    placeholder="Enter Thread manually"
+                >
+
+            </div>
+
+        </div>
+
+
+
+        <div class="form-group">
+
+            <label>Fabric / Canvas</label>
+
+            <input
+                type="text"
+                class="fabric-canvas"
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Hardware Finish</label>
+
+            <div class="material-row">
+
+                ${createMultiSelect("hardware finish")}
+
+                <input
+                    type="text"
+                    class="hardware-finish-free"
+                    placeholder="Enter Hardware Finish manually"
+                >
+
+            </div>
+
+        </div>
+
+
+        <div class="form-group">
+            <label>Webbing</label>
+            <div class="material-row">
+
+                ${createMultiSelect("webbing")}
+
+                <input
+                    type="text"
+                    class="webbing-free"
+                    placeholder="Enter Webbing manually"
+                >
+
+            </div>
+        </div>
+
+        <div class="form-group">
+
+            <label>Raw Edge / Folded Edge</label>
+
+            <input
+                type="text"
+                class="raw-folded-edge"
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Edge Color</label>
+
+            <input
+                type="text"
+                class="edge-color"
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Puller Tab</label>
+
+            <input
+                type="text"
+                class="puller-tab"
+            >
+
+        </div>
+
+
+        <div class="form-group">
+            <label>Zipper</label>
+            <div class="material-row">
+
+                ${createMultiSelect("zipper")}
+
+                <input
+                    type="text"
+                    class="zipper-free"
+                    placeholder="Enter Zipper manually"
+                >
+
+            </div>
+        </div>
+
+        <div class="form-group">
+
+            <label>Branding</label>
+
+            <input
+                type="file"
+                class="branding-input"
+                accept="image/*"
+                multiple
+            >
+
+            <div class="image-count branding-count">
+                0 / 10 images selected
+            </div>
+
+            <div
+                class="image-preview branding-preview"
+            ></div>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Changes</label>
+
+            <input
+                type="text"
+                class="changes"
+                placeholder="Enter Changes"
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Sample Dispatch Date
+            </label>
+
+            <input
+                type="date"
+                class="sample-dispatch-date"
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Reference Images
+            </label>
+
+            <input
+                type="file"
+                class="reference-input"
+                accept="image/*"
+                multiple
+            >
+
+            <div class="image-count reference-count">
+                0 / 10 images selected
+            </div>
+
+            <div
+                class="image-preview reference-preview"
+            ></div>
+
+        </div>
+
+    `;
+
+
+            document
+                .getElementById("articlesContainer")
+                .appendChild(articleBox);
+
+            const articleInput =
+                articleBox.querySelector(".article-no");
+
+            if (
+                typeof setupArticleDropdown ===
+                "function"
+            ) {
+                window.setupArticleDropdown(articleInput);
+            }
+
+            if (
+                typeof window.populateArticleDropdown ===
+                "function"
+            ) {
+                window.populateArticleDropdown(articleInput);
+            }
+
+            setupImageInput(
+                articleBox,
+                id,
+                "branding"
+            );
+
+            setupImageInput(
+                articleBox,
+                id,
+                "reference"
+            );
+
+
+            if (existingArticle) {
+
+                loadArticleData(
+                    articleBox,
+                    id,
+                    existingArticle
+                );
+
+            }
+
+        }
+
+
+        /* =========================================================
+           NORMALIZE MATERIAL VALUE
+           DB TEXT -> ARRAY
+        ========================================================= */
+
+        function normalizeMaterialValue(value) {
+            let values = [];
+
+            if (Array.isArray(value)) {
+                values = value;
+            } else if (value !== null && value !== undefined) {
+                let text = String(value).trim();
+
+                // {"Actual Material"} type value
+                if (text.startsWith("{") && text.endsWith("}")) {
+                    text = text.slice(1, -1).trim();
+
+                    // Remove surrounding quotes
+                    if (
+                        (text.startsWith('"') && text.endsWith('"')) ||
+                        (text.startsWith("'") && text.endsWith("'"))
+                    ) {
+                        text = text.slice(1, -1).trim();
+                    }
+
+                    values = text
+                        .split(",")
+                        .map(item => item.trim());
+                } else {
+                    values = text
+                        .split(",")
+                        .map(item => item.trim());
+                }
+            }
+
+            return values
+                .map(item => {
+                    if (typeof item === "string") {
+                        let text = item.trim();
+
+                        // Extra quotes/braces remove
+                        if (
+                            text.startsWith('"') &&
+                            text.endsWith('"')
+                        ) {
+                            text = text.slice(1, -1).trim();
+                        }
+
+                        if (
+                            text.startsWith("'") &&
+                            text.endsWith("'")
+                        ) {
+                            text = text.slice(1, -1).trim();
+                        }
+
+                        return text;
+                    }
+
+                    if (item && typeof item === "object") {
+                        return (
+                            item.value ??
+                            item.name ??
+                            item.label ??
+                            item.detail ??
+                            ""
+                        ).toString().trim();
+                    }
+
+                    return "";
+                })
+                .filter(Boolean);
+        }
+
+        function normalizeDateInput(value) {
+            if (!value) return "";
+
+            const text = String(value);
+
+            return text.includes("T")
+                ? text.split("T")[0]
+                : text;
+        }
+
+        /* =========================================================
+           LOAD ARTICLE DATA
+        ========================================================= */
+
+        function loadArticleData(
+            box,
+            id,
+            article
+        ) {
+
+            box.querySelector(
+                ".article-no"
+            ).value =
+                article.articleNo ||
+                article.article_no ||
+                "";
+
+            const articleTypeInput =
+                box.querySelector(".article-type");
+
+            if (articleTypeInput) {
+                articleTypeInput.value =
+                    article.articleType ||
+                    article.article_type ||
+                    "";
+            }
+
+            setMultiSelectValues(
+                box,
+                "leather",
+                normalizeMaterialValue(
+                    article.leather
+                )
+            );
+
+            setMultiSelectValues(
+                box,
+                "lining",
+                normalizeMaterialValue(
+                    article.lining
+                )
+            );
+
+            setMultiSelectValues(
+                box,
+                "hardware",
+                normalizeMaterialValue(
+                    article.hardware
+                )
+            );
+
+            setMultiSelectValues(
+                box,
+                "thread",
+                normalizeMaterialValue(
+                    article.thread
+                )
+            );
+
+
+
+
+            setInputValue(
+                box,
+                ".fabric-canvas",
+                article.fabricCanvas ??
+                article.fabric_canvas
+            );
+
+            setMultiSelectValues(
+                box,
+                "hardware_finish",
+                normalizeMaterialValue(
+                    article.hardware_finish
+                )
+            );
+
+            console.log("WEBBING DATA:", article.webbing);
+            console.log("ZIPPER DATA:", article.zipper);
+
+            setMultiSelectValues(
+                box,
+                "webbing",
+                normalizeMaterialValue(
+                    article.webbing
+                )
+            );
+
+            setInputValue(
+                box,
+                ".raw-folded-edge",
+                article.rawEdgeFoldedEdge ??
+                article.raw_edge_folded_edge
+            );
+
+            setInputValue(
+                box,
+                ".edge-color",
+                article.edgeColor ??
+                article.edge_color
+            );
+
+            setInputValue(
+                box,
+                ".puller-tab",
+                article.pullerTab ??
+                article.puller_tab
+            );
+
+            setMultiSelectValues(
+                box,
+                "zipper",
+                normalizeMaterialValue(
+                    article.zipper
+                )
+            );
+
+            setInputValue(
+                box,
+                ".changes",
+                article.changes
+            );
+
+            setInputValue(
+                box,
+                ".sample-dispatch-date",
+                article.sampleDispatchDate ??
+                article.sample_dispatch_date
+            );
+
+
+            /*
+               Old saved images
+            */
+
+            if (
+                Array.isArray(
+                    article.brandingImages ??
+                    article.branding_images
+                )
+            ) {
+
+                articleFiles[id].branding =
+                    (
+                        article.brandingImages ??
+                        article.branding_images
+                    )
+                        .map(image =>
+                            base64ToFile(image)
+                        )
+                        .filter(Boolean);
+
+            }
+
+
+            if (
+                Array.isArray(
+                    article.referenceImages ??
+                    article.reference_images
+                )
+            ) {
+
+                articleFiles[id].reference =
+                    (
+                        article.referenceImages ??
+                        article.reference_images
+                    )
+                        .map(image =>
+                            base64ToFile(image)
+                        )
+                        .filter(Boolean);
+
+            }
+
+
+            renderImages(
+                id,
+                "branding"
+            );
+
+            renderImages(
+                id,
+                "reference"
+            );
+
+        }
+
+
+        /* =========================================================
+           SET INPUT VALUE
+        ========================================================= */
+
+        function setInputValue(
+            box,
+            selector,
+            value
+        ) {
+
+            const input =
+                box.querySelector(selector);
+
+            if (input) {
+                input.value =
+                    value || "";
+            }
+
+        }
+
+
+        /* =========================================================
+           SET MULTI SELECT VALUES
+        ========================================================= */
+
+        function setMultiSelectValues(
+            box,
+            fieldName,
+            values
+        ) {
+
+            const multiBox =
+                box.querySelector(
+                    `.multi-select-box[data-field="${fieldName}"]`
+                );
+
+            if (!multiBox) {
+                return;
+            }
+
+
+            const selectedValues =
+                normalizeMaterialValue(values);
+
+
+            multiBox
+                .querySelectorAll(
+                    'input[type="checkbox"]'
+                )
+                .forEach(checkbox => {
+
+                    checkbox.checked =
+                        selectedValues.includes(
+                            checkbox.value
+                        );
+
+                });
+
+
+            /*
+               Values not present in dropdown
+               go into manual field.
+            */
+
+            const dropdownValues =
+                dropdownData[fieldName] || [];
+
+
+            const manualValues =
+                selectedValues.filter(
+                    value =>
+                        !dropdownValues.includes(value)
+                );
+
+
+            const freeInput =
+                box.querySelector(
+                    `.${fieldName}-free`
+                );
+
+
+            if (freeInput) {
+
+                freeInput.value =
+                    manualValues.join(", ");
+
+            }
+
+
+            updateMultiSelectButton(
+                multiBox
+            );
+
+        }
+
+
+        /* =========================================================
+           UPDATE MULTI SELECT BUTTON
+        ========================================================= */
+
+        function updateMultiSelectButton(
+            box
+        ) {
+
+            const selected =
+                Array.from(
+                    box.querySelectorAll(
+                        'input[type="checkbox"]:checked'
+                    )
+                ).map(
+                    checkbox =>
+                        checkbox.value
+                );
+
+
+            const button =
+                box.querySelector(
+                    ".multi-select-button"
+                );
+
+
+            if (selected.length === 0) {
+
+                button.textContent =
+                    "SELECT";
+
+            } else {
+
+                button.textContent =
+                    selected.join(", ");
+
+            }
+
+        }
+
+
+        /* =========================================================
+           REMOVE ARTICLE
+        ========================================================= */
+        function removeArticle(id) {
+            const box = document.querySelector(
+                `[data-article-id="${id}"]`
+            );
+
+            if (box) {
+                box.remove();
+            }
+
+            delete articleFiles[id];
+
+            // Remaining Article No. list refresh karo
+            if (typeof window.refreshArticleDropdowns === "function") {
+                window.refreshArticleDropdowns();
+            }
+        }
+
+        /* =========================================================
+           MULTI SELECT CLICK
+        ========================================================= */
+
+        document.addEventListener(
+            "click",
+            function (event) {
+
+                const button =
+                    event.target.closest(
+                        ".multi-select-button"
+                    );
+
+
+                const boxes =
+                    document.querySelectorAll(
+                        ".multi-select-box"
+                    );
+
+
+                if (button) {
+
+                    const box =
+                        button.closest(
+                            ".multi-select-box"
+                        );
+
+
+                    boxes.forEach(
+                        otherBox => {
+
+                            if (
+                                otherBox !== box
+                            ) {
+
+                                otherBox.classList.remove(
+                                    "open"
+                                );
+
+                            }
+
+                        }
+                    );
+
+
+                    box.classList.toggle(
+                        "open"
+                    );
+
+
+                    event.stopPropagation();
+
+                    return;
+
+                }
+
+
+                if (
+                    !event.target.closest(
+                        ".multi-select-box"
+                    )
+                ) {
+
+                    boxes.forEach(
+                        box => {
+
+                            box.classList.remove(
+                                "open"
+                            );
+
+                        }
+                    );
+
+                }
+
+            }
+        );
+
+
+        /* =========================================================
+           MULTI SELECT CHANGE
+        ========================================================= */
+
+        document.addEventListener(
+            "change",
+            function (event) {
+
+                if (
+                    !event.target.matches(
+                        ".multi-select-dropdown input[type='checkbox']"
+                    )
+                ) {
+                    return;
+                }
+
+
+                const box =
+                    event.target.closest(
+                        ".multi-select-box"
+                    );
+
+
+                updateMultiSelectButton(
+                    box
+                );
+
+            }
+        );
+
+        /* =========================================================
+           MULTI-SELECT SEARCH FILTER
+        ========================================================= */
+
+        document.addEventListener(
+            "input",
+            function (event) {
+
+                if (
+                    !event.target.matches(
+                        ".multi-select-search"
+                    )
+                ) {
+                    return;
+                }
+
+                const box =
+                    event.target.closest(
+                        ".multi-select-box"
+                    );
+
+                if (!box) {
+                    return;
+                }
+
+                const searchText =
+                    event.target.value
+                        .trim()
+                        .toLowerCase();
+
+                const options =
+                    box.querySelectorAll(
+                        ".multi-option"
+                    );
+
+                options.forEach(
+                    option => {
+
+                        const optionText =
+                            option
+                                .querySelector("span")
+                                ?.textContent
+                                .toLowerCase() || "";
+
+                        option.style.display =
+                            optionText.includes(
+                                searchText
+                            )
+                                ? ""
+                                : "none";
+                    }
+                );
+            }
+        );
+        /* =========================================================
+           GET SELECTED VALUES
+        ========================================================= */
+
+        function getSelectedValues(
+            box,
+            fieldName
+        ) {
+
+            const multiBox =
+                box.querySelector(
+                    `.multi-select-box[data-field="${fieldName}"]`
+                );
+
+
+            if (!multiBox) {
+                return [];
+            }
+
+
+            return Array.from(
+                multiBox.querySelectorAll(
+                    'input[type="checkbox"]:checked'
+                )
+            ).map(
+                checkbox =>
+                    checkbox.value
+            );
+
+        }
+
+
+        /* =========================================================
+           GET MATERIAL + FREE TEXT
+        ========================================================= */
+
+        function getMaterialValue(
+            box,
+            fieldName,
+            freeSelector
+        ) {
+
+            const selected =
+                getSelectedValues(
+                    box,
+                    fieldName
+                );
+
+
+            const free =
+                box.querySelector(
+                    freeSelector
+                )?.value.trim() || "";
+
+
+            if (free) {
+
+                free
+                    .split(",")
+                    .map(value => value.trim())
+                    .filter(Boolean)
+                    .forEach(value => {
+
+                        if (!selected.includes(value)) {
+                            selected.push(value);
+                        }
+
+                    });
+
+            }
+
+
+            return selected;
+
+        }
+
+
+        /* =========================================================
+           IMAGE COMPRESSION
+        ========================================================= */
+
+        function compressImage(file) {
+
+            const MAX_SIZE =
+                500 * 1024;
+
+
+            if (
+                file.size <= MAX_SIZE
+            ) {
+
+                return Promise.resolve(
+                    file
+                );
+
+            }
+
+
+            return new Promise(
+                (resolve, reject) => {
+
+                    const reader =
+                        new FileReader();
+
+
+                    reader.onload =
+                        function (event) {
+
+                            const img =
+                                new Image();
+
+
+                            img.onload =
+                                async function () {
+
+                                    let width =
+                                        img.width;
+
+                                    let height =
+                                        img.height;
+
+
+                                    const maxDimension =
+                                        1800;
+
+
+                                    if (
+                                        width > maxDimension ||
+                                        height > maxDimension
+                                    ) {
+
+                                        if (
+                                            width > height
+                                        ) {
+
+                                            height =
+                                                height *
+                                                maxDimension /
+                                                width;
+
+                                            width =
+                                                maxDimension;
+
+                                        } else {
+
+                                            width =
+                                                width *
+                                                maxDimension /
+                                                height;
+
+                                            height =
+                                                maxDimension;
+
+                                        }
+
+                                    }
+
+
+                                    let quality =
+                                        0.8;
+
+
+                                    for (
+                                        let i = 0;
+                                        i < 15;
+                                        i++
+                                    ) {
+
+                                        const canvas =
+                                            document.createElement(
+                                                "canvas"
+                                            );
+
+
+                                        canvas.width =
+                                            Math.round(
+                                                width
+                                            );
+
+                                        canvas.height =
+                                            Math.round(
+                                                height
+                                            );
+
+
+                                        const ctx =
+                                            canvas.getContext(
+                                                "2d"
+                                            );
+
+
+                                        ctx.drawImage(
+                                            img,
+                                            0,
+                                            0,
+                                            canvas.width,
+                                            canvas.height
+                                        );
+
+
+                                        const blob =
+                                            await new Promise(
+                                                resolveBlob => {
+
+                                                    canvas.toBlob(
+                                                        resolveBlob,
+                                                        "image/jpeg",
+                                                        quality
+                                                    );
+
+                                                }
+                                            );
+
+
+                                        if (
+                                            blob &&
+                                            blob.size <=
+                                            MAX_SIZE
+                                        ) {
+
+                                            resolve(
+                                                new File(
+                                                    [blob],
+                                                    file.name.replace(
+                                                        /\.[^/.]+$/,
+                                                        ".jpg"
+                                                    ),
+                                                    {
+                                                        type:
+                                                            "image/jpeg"
+                                                    }
+                                                )
+                                            );
+
+                                            return;
+
+                                        }
+
+
+                                        if (
+                                            quality > 0.35
+                                        ) {
+
+                                            quality -=
+                                                0.08;
+
+                                        } else {
+
+                                            width *=
+                                                0.8;
+
+                                            height *=
+                                                0.8;
+
+                                            quality =
+                                                0.7;
+
+                                        }
+
+                                    }
+
+
+                                    reject(
+                                        new Error(
+                                            "Image could not be compressed."
+                                        )
+                                    );
+
+                                };
+
+
+                            img.src =
+                                event.target.result;
+
+                        };
+
+
+                    reader.onerror =
+                        reject;
+
+
+                    reader.readAsDataURL(
+                        file
+                    );
+
+                }
+            );
+
+        }
+
+
+        /* =========================================================
+           BASE64 TO FILE
+        ========================================================= */
+
+        function base64ToFile(image) {
+
+            try {
+
+                if (
+                    !image ||
+                    !image.data
+                ) {
+                    return null;
+                }
+
+
+                const parts =
+                    image.data.split(",");
+
+
+                if (
+                    parts.length < 2
+                ) {
+                    return null;
+                }
+
+
+                const mime =
+                    image.type ||
+                    "image/jpeg";
+
+
+                const byteString =
+                    atob(parts[1]);
+
+
+                const array =
+                    new Uint8Array(
+                        byteString.length
+                    );
+
+
+                for (
+                    let i = 0;
+                    i < byteString.length;
+                    i++
+                ) {
+
+                    array[i] =
+                        byteString.charCodeAt(i);
+
+                }
+
+
+                return new File(
+                    [array],
+                    image.name || "image.jpg",
+                    {
+                        type: mime
+                    }
+                );
+
+            } catch (error) {
+
+                console.error(
+                    "Image conversion error:",
+                    error
+                );
+
+                return null;
+
+            }
+
+        }
+
+
+        /* =========================================================
+           IMAGE PREVIEW
+        ========================================================= */
+
+        function renderImages(
+            articleId,
+            type
+        ) {
+
+            const box =
+                document.querySelector(
+                    `[data-article-id="${articleId}"]`
+                );
+
+
+            if (!box) {
+                return;
+            }
+
+
+            const files =
+                articleFiles[
+                articleId
+                ][type];
+
+
+            const preview =
+                box.querySelector(
+                    `.${type}-preview`
+                );
+
+
+            const count =
+                box.querySelector(
+                    `.${type}-count`
+                );
+
+
+            preview.innerHTML = "";
+
+
+            count.textContent =
+                `${files.length} / 10 images selected`;
+
+
+            files.forEach(
+                (file, index) => {
+
+                    if (!file) {
+                        return;
+                    }
+
+
+                    const card =
+                        document.createElement(
+                            "div"
+                        );
+
+                    card.className =
+                        "image-card";
+
+
+                    const wrapper =
+                        document.createElement(
+                            "div"
+                        );
+
+                    wrapper.className =
+                        "image-wrapper";
+
+
+                    const img =
+                        document.createElement(
+                            "img"
+                        );
+
+
+                    img.src =
+                        URL.createObjectURL(
+                            file
+                        );
+
+
+                    const remove =
+                        document.createElement(
+                            "button"
+                        );
+
+                    remove.type =
+                        "button";
+
+                    remove.className =
+                        "remove-image";
+
+                    remove.textContent =
+                        "×";
+
+                    remove.title =
+                        "Remove image";
+
+
+                    remove.onclick =
+                        function () {
+
+                            articleFiles[
+                                articleId
+                            ][type].splice(
+                                index,
+                                1
+                            );
+
+
+                            renderImages(
+                                articleId,
+                                type
+                            );
+
+                        };
+
+
+                    wrapper.appendChild(
+                        img
+                    );
+
+                    wrapper.appendChild(
+                        remove
+                    );
+
+
+                    const name =
+                        document.createElement(
+                            "div"
+                        );
+
+                    name.className =
+                        "image-name";
+
+                    name.textContent =
+                        file.name;
+
+
+                    const size =
+                        document.createElement(
+                            "div"
+                        );
+
+                    size.className =
+                        "image-size";
+
+                    size.textContent =
+                        `${(
+                            file.size / 1024
+                        ).toFixed(0)} KB`;
+
+
+                    card.appendChild(
+                        wrapper
+                    );
+
+                    card.appendChild(
+                        name
+                    );
+
+                    card.appendChild(
+                        size
+                    );
+
+
+                    preview.appendChild(
+                        card
+                    );
+
+                }
+            );
+
+        }
+
+
+        /* =========================================================
+           IMAGE INPUT
+        ========================================================= */
+
+        function setupImageInput(
+            box,
+            articleId,
+            type
+        ) {
+
+            const input =
+                box.querySelector(
+                    `.${type}-input`
+                );
+
+
+            input.addEventListener(
+                "change",
+                async function () {
+
+                    const selected =
+                        Array.from(
+                            this.files
+                        );
+
+
+                    const current =
+                        articleFiles[
+                        articleId
+                        ][type];
+
+
+                    if (
+                        current.length +
+                        selected.length >
+                        10
+                    ) {
+
+                        alert(
+                            "Maximum 10 images are allowed."
+                        );
+
+                        this.value = "";
+
+                        return;
+
+                    }
+
+
+                    for (
+                        const file
+                        of selected
+                    ) {
+
+                        try {
+
+                            const compressed =
+                                await compressImage(
+                                    file
+                                );
+
+
+                            current.push(
+                                compressed
+                            );
+
+                        } catch (error) {
+
+                            alert(
+                                "One of the images could not be processed."
+                            );
+
+                        }
+
+                    }
+
+
+                    renderImages(
+                        articleId,
+                        type
+                    );
+
+
+                    this.value = "";
+
+                }
+            );
+
+        }
+
+
+        /* =========================================================
+           FILE TO BASE64
+        ========================================================= */
+
+        function fileToBase64(file) {
+
+            return new Promise(
+                (resolve, reject) => {
+
+                    const reader =
+                        new FileReader();
+
+
+                    reader.onload =
+                        () =>
+                            resolve(
+                                reader.result
+                            );
+
+
+                    reader.onerror =
+                        reject;
+
+
+                    reader.readAsDataURL(
+                        file
+                    );
+
+                }
+            );
+
+        }
+
+
+        /* =========================================================
+           GET LOGGED IN USER
+        ========================================================= */
+
+        function getLoggedInUser() {
+
+            const possibleKeys = [
+                "user",
+                "loggedInUser",
+                "currentUser",
+                "userData"
+            ];
+
+
+            for (
+                const key
+                of possibleKeys
+            ) {
+
+                const value =
+                    localStorage.getItem(
+                        key
+                    );
+
+
+                if (!value) {
+                    continue;
+                }
+
+
+                try {
+
+                    const parsed =
+                        JSON.parse(value);
+
+                    if (parsed) {
+                        return parsed;
+                    }
+
+                } catch (error) {
+
+                    console.warn(
+                        `Invalid user data in ${key}`
+                    );
+
+                }
+
+            }
+
+
+            return null;
+
+        }
+
+
+        /* =========================================================
+           LOAD EDIT REQUEST FROM API
+        ========================================================= */
+
+        async function loadEditRequest() {
+
+            if (!isEditMode) {
+                return;
+            }
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        `${API_BASE}/${encodeURIComponent(editRequestId)}`
+                    );
+
+
+                if (!response.ok) {
+                    console.log("EDIT REQUEST STATUS:", response.status);
+                    console.log("EDIT REQUEST URL:", response.url);
+
+                    const errorText = await response.text();
+                    console.log("EDIT REQUEST RESPONSE:", errorText);
+
+                    throw new Error(
+                        `Failed to load sample request. Status: ${response.status}`
+                    );
+                }
+
+
+                editingRequest =
+                    await response.json();
+
+                const selectedClientCode =
+                    editingRequest.client_code ??
+                    editingRequest.clientCode ??
+                    "";
+
+                document.getElementById("ClientCode").value =
+                    selectedClientCode;
+
+                document.getElementById("inquiryReceivedDate").value =
+                    normalizeDateInput(
+                        editingRequest.inquiry_received_date ??
+                        editingRequest.inquiryReceivedDate
+                    );
+
+                const articles =
+                    Array.isArray(
+                        editingRequest.articles
+                    )
+                        ? editingRequest.articles
+                        : [];
+
+
+                if (
+                    articles.length === 0
+                ) {
+
+                    addArticle();
+
+                } else {
+
+                    articles.forEach(
+                        article => {
+
+                            addArticle(
+                                article
+                            );
+
+                        }
+                    );
+
+                }
+
+                const selectedClient =
+                    (window.allClients || []).find(
+                        client =>
+                            String(client.client_code) ===
+                            String(selectedClientCode)
+                    );
+
+                if (selectedClient) {
+                    await loadArticles(selectedClient.id);
+                }
+
+            } catch (error) {
+
+                console.error("Load edit request error:", error);
+                console.error("ERROR MESSAGE:", error?.message);
+                console.error("ERROR STACK:", error?.stack);
+
+                alert(
+                    "EDIT ERROR: " +
+                    (error?.message || error)
+                );
+
+                return;
+            }
+
+
+        }
+
+
+
+
+        /* =========================================================
+           LOAD FORM
+        ========================================================= */
+
+        async function loadForm() {
+
+            await loadDropdownData();
+
+            if (isEditMode) {
+
+                await loadEditRequest();
+
+                return;
+
+            }
+
+
+            addArticle();
+
+        }
+
+
+        /* =========================================================
+           ADD ARTICLE BUTTON
+        ========================================================= */
+
+        document
+            .getElementById(
+                "addArticleBtn"
+            )
+            .addEventListener(
+                "click",
+                function () {
+
+                    addArticle();
+
+                }
+            );
+
+
+        /* =========================================================
+           COLLECT ARTICLE DATA
+        ========================================================= */
+
+        async function collectArticleData() {
+
+            const articleBoxes =
+                document.querySelectorAll(
+                    ".article-box"
+                );
+
+
+            const articleData = [];
+
+
+            for (
+                const box
+                of articleBoxes
+            ) {
+
+                const id =
+                    Number(
+                        box.dataset.articleId
+                    );
+
+
+                const brandingImages =
+                    [];
+
+
+                for (
+                    const file
+                    of articleFiles[id].branding
+                ) {
+
+                    brandingImages.push({
+
+                        name:
+                            file.name,
+
+                        size:
+                            file.size,
+
+                        type:
+                            file.type,
+
+                        data:
+                            await fileToBase64(
+                                file
+                            )
+
+                    });
+
+                }
+
+
+                const referenceImages =
+                    [];
+
+
+                for (
+                    const file
+                    of articleFiles[id].reference
+                ) {
+
+                    referenceImages.push({
+
+                        name:
+                            file.name,
+
+                        size:
+                            file.size,
+
+                        type:
+                            file.type,
+
+                        data:
+                            await fileToBase64(
+                                file
+                            )
+
+                    });
+
+                }
+
+
+                articleData.push({
+
+                    articleNo:
+                        box.querySelector(
+                            ".article-no"
+                        ).value.trim(),
+
+                    articleType:
+                        box.querySelector(
+                            ".article-type"
+                        ).value,
+
+                    leather:
+                        getMaterialValue(
+                            box,
+                            "leather",
+                            ".leather-free"
+                        ),
+
+
+                    lining:
+                        getMaterialValue(
+                            box,
+                            "lining",
+                            ".lining-free"
+                        ),
+
+
+                    hardware:
+                        getMaterialValue(
+                            box,
+                            "hardware",
+                            ".hardware-free"
+                        ),
+
+
+                    thread:
+                        getMaterialValue(
+                            box,
+                            "thread",
+                            ".thread-free"
+                        ),
+
+
+
+
+                    fabricCanvas:
+                        box.querySelector(
+                            ".fabric-canvas"
+                        ).value.trim(),
+
+
+                    hardware_finish:
+                        getMaterialValue(
+                            box,
+                            "hardware_finish",
+                            ".hardware-finish-free"
+                        ),
+
+
+                    webbing:
+                        getMaterialValue(
+                            box,
+                            "webbing",
+                            ".webbing-free"
+                        ),
+
+                    rawEdgeFoldedEdge:
+                        box.querySelector(
+                            ".raw-folded-edge"
+                        ).value.trim(),
+
+
+                    edgeColor:
+                        box.querySelector(
+                            ".edge-color"
+                        ).value.trim(),
+
+
+                    pullerTab:
+                        box.querySelector(
+                            ".puller-tab"
+                        ).value.trim(),
+
+
+                    zipper:
+                        getMaterialValue(
+                            box,
+                            "zipper",
+                            ".zipper-free"
+                        ),
+
+
+                    brandingImages:
+                        brandingImages,
+
+
+                    changes:
+                        box.querySelector(
+                            ".changes"
+                        ).value.trim(),
+
+
+                    sampleDispatchDate:
+                        box.querySelector(
+                            ".sample-dispatch-date"
+                        ).value,
+
+
+                    referenceImages:
+                        referenceImages
+
+                });
+
+            }
+
+
+            return articleData;
+
+        }
+
+
+        /* =========================================================
+           SUBMIT / UPDATE
+        ========================================================= */
+
+        document
+            .getElementById(
+                "sampleRequestForm"
+            )
+            .addEventListener(
+                "submit",
+                async function (event) {
+
+                    event.preventDefault();
+
+
+                    const submitBtn =
+                        document.getElementById(
+                            "submitBtn"
+                        );
+
+
+                    submitBtn.disabled =
+                        true;
+
+                    submitBtn.textContent =
+                        isEditMode
+                            ? "Updating..."
+                            : "Submitting...";
+
+
+                    try {
+
+                        const articleData =
+                            await collectArticleData();
+
+
+                        if (
+                            articleData.length === 0
+                        ) {
+
+                            throw new Error(
+                                "At least one article is required."
+                            );
+
+                        }
+
+
+                        const user =
+                            getLoggedInUser();
+
+
+                        const createdBy =
+                            user?.id ||
+                            user?.userId ||
+                            null;
+
+
+                        /* =========================================
+                           UPDATE EXISTING REQUEST
+                        ========================================= */
+
+                        if (isEditMode) {
+
+                            console.log("UPDATE REQUEST:", editRequestId);
+                            console.log("UPDATE DATA:", articleData);
+
+
+
+                            const response =
+                                await fetch(
+                                    `${API_BASE}/${encodeURIComponent(editRequestId)}`,
+                                    {
+                                        method: "PUT",
+
+                                        headers: {
+                                            "Content-Type":
+                                                "application/json"
+                                        },
+
+                                        body:
+                                            JSON.stringify({
+
+                                                clientCode:
+                                                    document.getElementById(
+                                                        "ClientCode"
+                                                    ).value,
+
+                                                inquiryReceivedDate:
+                                                    document.getElementById(
+                                                        "inquiryReceivedDate"
+                                                    ).value,
+
+                                                status:
+                                                    "UPDATED",
+
+                                                articles:
+                                                    articleData
+
+                                            })
+
+                                    }
+                                );
+
+
+                            const responseText = await response.text();
+
+                            let result;
+
+                            try {
+                                result = JSON.parse(responseText);
+                            } catch (parseError) {
+                                console.error("Non-JSON server response:", responseText);
+
+                                throw new Error(
+                                    "SERVER RESPONSE:\n" +
+                                    response.status +
+                                    "\n\n" +
+                                    responseText
+                                );
+                            }
+
+                            if (!response.ok) {
+
+                                throw new Error(
+                                    result.message ||
+                                    "Failed to update sample request."
+                                );
+
+                            }
+
+
+                            alert(
+                                "Sample request updated successfully."
+                            );
+
+
+                            window.location.href =
+                                "sample requests1.html";
+
+
+                            return;
+
+                        }
+
+
+                        /* =========================================
+                           CREATE NEW REQUEST
+                        ========================================= */
+
+                        const requestId =
+                            "SR-" +
+                            Date.now();
+
+                        console.log(
+                            "DATE BEING SENT:",
+                            document.getElementById("inquiryReceivedDate").value
+                        );
+
+                        const response =
+                            await fetch(
+                                API_BASE,
+                                {
+                                    method: "POST",
+
+                                    headers: {
+                                        "Content-Type":
+                                            "application/json"
+                                    },
+
+                                    body:
+                                        JSON.stringify({
+
+                                            requestId:
+                                                requestId,
+
+                                            clientCode:
+                                                document.getElementById(
+                                                    "ClientCode"
+                                                ).value,
+
+                                            inquiryReceivedDate:
+                                                document.getElementById(
+                                                    "inquiryReceivedDate"
+                                                ).value,
+
+                                            status:
+                                                "SUBMITTED",
+
+                                            createdBy:
+                                                createdBy,
+
+                                            articles:
+                                                articleData
+
+                                        })
+
+                                }
+                            );
+
+
+                        const result =
+                            await response.json();
+
+
+                        if (!response.ok) {
+
+                            throw new Error(
+                                result.message ||
+                                "Failed to create sample request."
+                            );
+
+                        }
+
+
+                        alert(
+                            "Sample request submitted successfully."
+                        );
+
+
+                        window.location.href =
+                            "sample requests1.html";
+
+
+                    } catch (error) {
+
+                        console.error(
+                            "Save sample request error:",
+                            error
+                        );
+
+
+                        alert(
+                            error.message ||
+                            "Something went wrong while saving."
+                        );
+
+
+                        submitBtn.disabled =
+                            false;
+
+
+                        submitBtn.textContent =
+                            isEditMode
+                                ? "Update"
+                                : "Submit";
+
+                    }
+
+                }
+            );
+
+
+        /* =========================================================
+           START
+        ========================================================= */
+
+        loadForm();
+
+        function goBack() {
+            window.location.href = "dashboard1.html";
+        }
+
+    </script>
+    <script src="./client-article-dropdown.js"></script>
+
+</body>
+
+</html>

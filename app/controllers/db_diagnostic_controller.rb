@@ -1,5 +1,12 @@
 
 class DbDiagnosticController < ApplicationController
+  def versions
+  render json: {
+    rails_version: Rails.version,
+    pg_version: Gem.loaded_specs["pg"]&.version&.to_s
+  }
+end
+
   def show
   return unauthorized unless valid_token?
 

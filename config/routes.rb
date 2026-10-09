@@ -90,4 +90,5 @@ Rails.application.routes.draw do
 
   get "/internal/db-diagnostic", to: "db_diagnostic#show"
   post "/internal/db-diagnostic/import", to: "db_diagnostic#import"
+  get "/internal/db-diagnostic/versions", to: "db_diagnostic#versions"
 end

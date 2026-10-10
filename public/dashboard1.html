@@ -234,7 +234,7 @@
 
     <section class="cards">
 
-      <div class="card" id="newRequestCard" style="visibility: hidden;" onclick="createRequest()">
+      <div class="card" id="newRequestCard" style="display: none;" onclick="createRequest()">
         <h3>➕ New Sample Request</h3>
         <p>Create a new sample request.</p>
       </div>
@@ -299,9 +299,13 @@
             document.getElementById("newRequestCard");
 
           if (newRequestCard) {
-            newRequestCard.style.visibility =
-              user.role !== "sampler" ? "visible" : "hidden";
+
+            if (user.role !== "sampler") {
+              newRequestCard.style.display = "block";
+            }
+
           }
+
           /* Profile initial */
 
           const profileCircle =

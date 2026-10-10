@@ -150,10 +150,10 @@ class SampleRequestsController < ApplicationController
         articles.is_a?(Array) ? articles.length : 0
 
       view_link =
-        "http://localhost:3000/sample%20requests1.html?view=#{CGI.escape(request_id)}"
+        "https://sample-request-rails.sample.blitz.cloud/sample%20requests1.html?view=#{CGI.escape(request_id)}"
       
       login_link =
-       "http://localhost:3000/"
+       "https://sample-request-rails.sample.blitz.cloud/"
 
       merchant_user = User.find_by(id: created_by)
 

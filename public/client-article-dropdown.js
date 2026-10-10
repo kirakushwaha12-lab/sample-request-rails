@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         try {
             const response = await fetch(
-                "http://localhost:3000/api/clients/my-clients",
+                "/api/clients/my-clients",
                 {
                     method: "GET",
                     headers: {
@@ -117,7 +117,7 @@ document.addEventListener("DOMContentLoaded", () => {
             console.log("FETCHING ARTICLES FOR CLIENT ID:", clientId);
 
             const response = await fetch(
-                "http://localhost:3000/api/clients/my-articles",
+                "/api/clients/my-articles",
                 {
                     method: "GET",
                     headers: {

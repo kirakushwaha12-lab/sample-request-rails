@@ -482,7 +482,7 @@
         ========================================================= */
 
         const API_BASE =
-            "http://localhost:3000/api/sample-requests";
+            "/api/sample-requests";
 
         console.log("🔥 API BASE:", API_BASE);
         /* =========================================================
@@ -536,7 +536,7 @@
         async function loadDropdownData() {
             try {
                 const response = await fetch(
-                    "http://localhost:3000/api/dropdown-options"
+                    "/api/dropdown-options"
                 );
 
                 if (!response.ok) {

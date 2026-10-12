@@ -163,21 +163,45 @@ result = connection.exec_query(query)
     
     connection = ActiveRecord::Base.connection
 
-connection.execute(
-  <<~SQL
-    UPDATE tracker_stages
-    SET
-      current_stage = #{connection.quote(new_stage)},
-      updated_at = CURRENT_TIMESTAMP
-    WHERE sample_request_id = (
-      SELECT id
-      FROM sample_requests
-      WHERE request_id = #{connection.quote(request_id)}
-      LIMIT 1
+        updated_rows = connection.update(
+      <<~SQL
+        UPDATE tracker_stages
+        SET
+          current_stage = #{connection.quote(new_stage)},
+          updated_at = CURRENT_TIMESTAMP
+        WHERE sample_request_id = (
+          SELECT id
+          FROM sample_requests
+          WHERE request_id = #{connection.quote(request_id)}
+          LIMIT 1
+        )
+      SQL
     )
-  SQL
-)
 
+    if updated_rows.zero?
+      connection.execute(
+        <<~SQL
+          INSERT INTO tracker_stages (
+            sample_request_id,
+            current_stage,
+            created_at,
+            updated_at
+          )
+          VALUES (
+            (
+              SELECT id
+              FROM sample_requests
+              WHERE request_id = #{connection.quote(request_id)}
+              LIMIT 1
+            ),
+            #{connection.quote(new_stage)},
+            CURRENT_TIMESTAMP,
+            CURRENT_TIMESTAMP
+          )
+        SQL
+      )
+    end
+      
     render json: {
       message: "Tracker stage updated successfully",
       request_id: request_id,

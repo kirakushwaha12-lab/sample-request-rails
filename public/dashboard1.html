@@ -211,7 +211,7 @@
 
 </head>
 
-<body>
+<body style="visibility: hidden;">
 
   <header class="header">
 
@@ -292,7 +292,7 @@
 
           const user = data.user;
 
-
+          document.body.style.visibility = "visible";
           /* DB-based role check */
 
           const newRequestCard =

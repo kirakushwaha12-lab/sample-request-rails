@@ -1539,6 +1539,12 @@
                     box
                 );
 
+                console.log(
+                    "NEW FORM CHECK:",
+                    box.dataset.field,
+                    box.querySelectorAll('input[type="checkbox"]:checked').length,
+                    box.querySelector(".multi-select-button")?.textContent
+                );
             }
         );
 

@@ -602,12 +602,17 @@
                         >
 
                         <div class="multi-select-options">
-                            ${options.map(option => `
-                                <label class="multi-option">
-                                    <input type="checkbox" value="${option}">
-                                    <span>${option}</span>
-                               </label>
-                           `).join("")}
+                            
+                           ${options.map(option => {
+                const name = String(option ?? "").trim();
+                return `
+                                   <label class="multi-option">
+                                       <input type="checkbox" value="${name.replace(/&/g, "&amp;").replace(/"/g, "&quot;")}">
+                                       <span>${name}</span>
+                                   </label>
+                                `;
+            }).join("")}
+
                        </div>
 
                    </div>
@@ -1383,39 +1388,29 @@
            UPDATE MULTI SELECT BUTTON
         ========================================================= */
 
-        function updateMultiSelectButton(
-            box
-        ) {
+        function updateMultiSelectButton(box) {
+            const selected = Array.from(
+                box.querySelectorAll('input[type="checkbox"]:checked')
+            ).map(checkbox => {
+                const value = checkbox.value?.trim();
 
-            const selected =
-                Array.from(
-                    box.querySelectorAll(
-                        'input[type="checkbox"]:checked'
-                    )
-                ).map(
-                    checkbox =>
-                        checkbox.value
-                );
+                if (value) {
+                    return value;
+                }
 
+                return checkbox
+                    .closest(".multi-option")
+                    ?.querySelector("span")
+                    ?.textContent.trim() || "";
+            }).filter(Boolean);
 
-            const button =
-                box.querySelector(
-                    ".multi-select-button"
-                );
+            const button = box.querySelector(".multi-select-button");
 
-
-            if (selected.length === 0) {
-
-                button.textContent =
-                    "SELECT";
-
-            } else {
-
-                button.textContent =
-                    selected.join(", ");
-
+            if (button) {
+                button.textContent = selected.length
+                    ? selected.join(", ")
+                    : "SELECT";
             }
-
         }
 
 
@@ -1612,32 +1607,33 @@
            GET SELECTED VALUES
         ========================================================= */
 
-        function getSelectedValues(
-            box,
-            fieldName
-        ) {
-
-            const multiBox =
-                box.querySelector(
-                    `.multi-select-box[data-field="${fieldName}"]`
-                );
-
+        function getSelectedValues(box, fieldName) {
+            const multiBox = box.querySelector(
+                `.multi-select-box[data-field="${fieldName}"]`
+            );
 
             if (!multiBox) {
                 return [];
             }
 
-
             return Array.from(
                 multiBox.querySelectorAll(
                     'input[type="checkbox"]:checked'
                 )
-            ).map(
-                checkbox =>
-                    checkbox.value
-            );
+            ).map(checkbox => {
+                const value = checkbox.value?.trim();
 
+                if (value) {
+                    return value;
+                }
+
+                return checkbox
+                    .closest(".multi-option")
+                    ?.querySelector("span")
+                    ?.textContent.trim() || "";
+            }).filter(Boolean);
         }
+
 
 
         /* =========================================================

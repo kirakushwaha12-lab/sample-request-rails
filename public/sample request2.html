@@ -582,6 +582,12 @@
         function createMultiSelect(fieldName) {
             const options = dropdownData[fieldName] || [];
 
+            console.log(
+                "MULTISELECT DATA:",
+                fieldName,
+                options.slice(0, 5)
+            );
+
             return `
                 <div class="multi-select-box" data-field="${fieldName}">
                     <button type="button" class="multi-select-button">SELECT</button>
